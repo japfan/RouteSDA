@@ -29,14 +29,14 @@ Tugasnya fokus pada struktur penyimpanan paket makanan yang masuk dan memastikan
  *OrderManager.java*: Kelas yang mengelola kumpulan DeliveryOrder. Menggunakan struktur data *Collection* (seperti PriorityQueue atau LinkedList yang diurutkan). Berisi fungsi addOrder(), removeOrder(), dan fungsi sortOrdersByDeadline() untuk mengurutkan pesanan dari waktu yang paling mendesak.
   *InputValidator.java*: Kelas pembantu (*helper*) untuk menangani *edge cases*. Berisi metode statis untuk membungkus Scanner agar program tidak *crash* jika pengguna memasukkan input huruf saat diminta input angka (menggunakan blok try-catch).
 
-Anggota 3: Modul Antarmuka & Integrasi (CLI & Main)
+Anggota 3: Modul Antarmuka & Integrasi (GUI & Main)
 Tugasnya menyatukan (*wiring*) kode dari Anggota 1 dan 2, menyiapkan *dummy data*, dan membangun menu terminal yang interaktif.
  *MapSeeder.java*: Kelas utilitas yang otomatis membangun peta perumahan (menambahkan *node* dan *edge* secara *hardcode*). Ini penting agar saat pengujian (*Live Demo*), kalian tidak perlu menginput data peta satu per satu dari awal.
- *MenuCLI.java*: Kelas yang berisi perulangan utama (while) untuk menampilkan teks menu di terminal. Mengatur alur seperti:
+ *MenuGUI.java*: Kelas yang berisi perulangan utama (while) untuk menampilkan teks menu di terminal. Mengatur alur seperti:
    1. Tampilkan Peta Jaringan
    2. Input Pesanan Makanan Baru (Memanggil OrderManager)
    3. Lihat Daftar Antrean Pesanan
    4. Cari Rute Tercepat untuk Pesanan Teratas (Memanggil RouteOptimizer)
- *Main.java*: *Entry point* program. File ini dijaga agar tetap bersih (*clean*), hanya berisi public static void main(String[] args) yang menginisialisasi MapSeeder, dan menjalankan MenuCLI.start().
+ *Main.java*: *Entry point* program. File ini dijaga agar tetap bersih (*clean*), hanya berisi public static void main(String[] args) yang menginisialisasi MapSeeder, dan menjalankan MenuGUI.start().
 *Tips Eksekusi Tim:*
-Supaya Anggota 3 bisa mulai mengerjakan MenuCLI.java tanpa harus menunggu Anggota 1 dan 2 selesai, Anggota 1 dan 2 cukup membuat *kerangka fungsinya saja (Method Signature) terlebih dahulu* dengan *return value* palsu sementara (*stub*). Setelah kerangkanya ada, Anggota 3 bisa mulai mengintegrasikan menu, sementara Anggota 1 dan 2 melengkapi isi logikanya di *file* mereka masing-masing.
+Supaya Anggota 3 bisa mulai mengerjakan MenuGUI.java tanpa harus menunggu Anggota 1 dan 2 selesai, Anggota 1 dan 2 cukup membuat *kerangka fungsinya saja (Method Signature) terlebih dahulu* dengan *return value* palsu sementara (*stub*). Setelah kerangkanya ada, Anggota 3 bisa mulai mengintegrasikan menu, sementara Anggota 1 dan 2 melengkapi isi logikanya di *file* mereka masing-masing.
