@@ -14,40 +14,6 @@ import java.util.PriorityQueue;
  * Pesanan dengan deadline TERKECIL selalu berada di posisi atas
  * antrian — kurir selalu mengerjakan pesanan paling mendesak dulu.
  *
- * ============================================================
- * KETERKAITAN DENGAN MODUL LAIN:
- * ============================================================
- *
- * ► Graph.java (Anggota 1):
- * addOrder() menerima Graph untuk memvalidasi bahwa kedua node
- * (restaurantNode dan destinationNode) benar-benar ada di peta
- * sebelum pesanan masuk antrian.
- *
- * Metode yang digunakan: Graph.containsNode(String)
- *
- * ► RouteOptimizer.java (Anggota 1):
- * cariRuteTopOrder() mengintegrasikan kedua modul:
- * 1. Mengambil pesanan paling atas (getTopOrder)
- * 2. Memanggil RouteOptimizer.hitungDijkstra() dengan
- * restaurantNode → "asal" dan destinationNode → "tujuan"
- * 3. Mengembalikan List<String> rute yang dihasilkan
- *
- * Metode yang digunakan:
- * RouteOptimizer.hitungDijkstra(Graph, String asal, String tujuan)
- *
- * ► DeliveryOrder.java (Anggota 2):
- * Elemen yang disimpan di dalam PriorityQueue.
- *
- * ► MenuGUI.java (Anggota 3) — alur penggunaan yang disarankan:
- * // Tambah pesanan dengan validasi peta
- * manager.addOrder(pesanan, graph);
- *
- * // Cari rute untuk pesanan teratas (menu 4)
- * List<String> rute = manager.cariRuteTopOrder(graph);
- *
- * // Setelah kurir selesai antar:
- * manager.removeOrder();
- *
  * Modul : Manajemen Pesanan (Sorting & Priority)
  * Anggota : Anggota 2
  *
@@ -178,9 +144,9 @@ public class OrderManager {
     }
 
     /**
-     * ═══════════════════════════════════════════════════════════
+     * ============================================================
      * METODE INTEGRASI UTAMA dengan RouteOptimizer (Anggota 1)
-     * ═══════════════════════════════════════════════════════════
+     * ============================================================
      *
      * Mencari rute terpendek untuk pesanan PALING ATAS di antrian
      * dengan memanggil RouteOptimizer.hitungDijkstra().
@@ -209,17 +175,17 @@ public class OrderManager {
         }
 
         // Tampilkan info pesanan yang sedang diproses
-        System.out.println("╔══════════════════════════════════════════╗");
-        System.out.println("║       MEMPROSES PESANAN PRIORITAS        ║");
-        System.out.println("╠══════════════════════════════════════════╣");
-        System.out.println("║  Pesanan  : " + topOrder.getOrderId());
-        System.out.println("║  Pelanggan: " + topOrder.getCustomerName());
-        System.out.println("║  Dari     : " + topOrder.getRestaurantNode());
-        System.out.println("║  Ke       : " + topOrder.getDestinationNode());
-        System.out.println("║  Deadline : " + topOrder.getDeadlineTime() + " menit");
-        System.out.println("╠══════════════════════════════════════════╣");
-        System.out.println("║  Memanggil RouteOptimizer.hitungDijkstra...");
-        System.out.println("╚══════════════════════════════════════════╝");
+        System.out.println("|==========================================|");
+        System.out.println("|       MEMPROSES PESANAN PRIORITAS        |");
+        System.out.println("|==========================================|");
+        System.out.println("|  Pesanan  : " + topOrder.getOrderId());
+        System.out.println("|  Pelanggan: " + topOrder.getCustomerName());
+        System.out.println("|  Dari     : " + topOrder.getRestaurantNode());
+        System.out.println("|  Ke       : " + topOrder.getDestinationNode());
+        System.out.println("|  Deadline : " + topOrder.getDeadlineTime() + " menit");
+        System.out.println("|==========================================|");
+        System.out.println("|  Memanggil RouteOptimizer.hitungDijkstra...");
+        System.out.println("|==========================================|");
 
         // ─────────────────────────────────────────────────────────────
         // INTI INTEGRASI: Panggil Dijkstra dari Anggota 1
@@ -254,12 +220,12 @@ public class OrderManager {
      * diurutkan dari yang paling mendesak (deadline terkecil).
      */
     public void displayQueue() {
-        System.out.println("╔══════════════════════════════════════════════════════════════════╗");
-        System.out.println("║              DAFTAR ANTRIAN PESANAN PENGIRIMAN                  ║");
-        System.out.println("╠══════════════════════════════════════════════════════════════════╣");
+        System.out.println("|==================================================================|");
+        System.out.println("|              DAFTAR ANTRIAN PESANAN PENGIRIMAN                   |");
+        System.out.println("|==================================================================|");
 
         if (orderQueue.isEmpty()) {
-            System.out.println("║  (Tidak ada pesanan dalam antrian saat ini)                      ║");
+            System.out.println("|  (Tidak ada pesanan dalam antrian saat ini)                      |");
         } else {
             // Ambil snapshot terurut — tidak mengubah antrian asli
             List<DeliveryOrder> snapshot = sortOrdersByDeadline();
@@ -268,9 +234,9 @@ public class OrderManager {
             }
         }
 
-        System.out.println("╠══════════════════════════════════════════════════════════════════╣");
-        System.out.printf("║  Total pesanan dalam antrian: %-35d ║%n", orderQueue.size());
-        System.out.println("╚══════════════════════════════════════════════════════════════════╝");
+        System.out.println("|==================================================================|");
+        System.out.printf("|  Total pesanan dalam antrian: %-35d |%n", orderQueue.size());
+        System.out.println("|==================================================================|");
     }
 
     // ==================== METODE BANTU ====================
