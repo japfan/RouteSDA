@@ -29,7 +29,7 @@ public class RouteOptimizer {
     /**
      * Inner class untuk merepresentasikan sebuah node beserta
      * jarak kumulatifnya dari node asal di dalam PriorityQueue.
-     * 
+     *
      * Digunakan secara internal oleh algoritma Dijkstra sebagai
      * elemen yang disimpan di Min-Heap.
      */
@@ -40,6 +40,57 @@ public class RouteOptimizer {
         NodeJarak(String namaNode, int jarak) {
             this.namaNode = namaNode;
             this.jarak = jarak;
+        }
+    }
+
+    // ============================================================
+    // CLASS UNTUK ANIMASI VISUALISASI ALGORITMA DIJKSTRA
+    // ============================================================
+
+    /**
+     * Mewakili satu langkah eksplorasi dalam algoritma Dijkstra.
+     * Digunakan oleh MapPanel untuk menganimasikan proses pencarian rute.
+     */
+    public static class LangkahAnimasi {
+        /** Node yang sedang dikunjungi (dipoll dari PriorityQueue) */
+        public String nodeDikunjungi;
+        /** Node asal yang menuju ke node ini (parent dalam path) */
+        public String dariNode;
+        /** Jarak kumulatif dari node awal ke node ini */
+        public int jarakKumulatif;
+        /** Tipe langkah: "VISIT" (node diproses), "RELAX" (edge diperbarui) */
+        public String tipe;
+        /** Untuk RELAX: node tetangga yang jaraknya diperbarui */
+        public String nodeDiperbarui;
+
+        public LangkahAnimasi(String nodeDikunjungi, String dariNode, int jarakKumulatif, String tipe, String nodeDiperbarui) {
+            this.nodeDikunjungi = nodeDikunjungi;
+            this.dariNode = dariNode;
+            this.jarakKumulatif = jarakKumulatif;
+            this.tipe = tipe;
+            this.nodeDiperbarui = nodeDiperbarui;
+        }
+    }
+
+    /**
+     * Menyimpan hasil lengkap algoritma Dijkstra termasuk
+     * langkah-langkah untuk keperluan animasi visual.
+     */
+    public static class HasilAnimasi {
+        /** Urutan path terpendek dari asal ke tujuan */
+        public List<String> path;
+        /** Total jarak terpendek */
+        public int totalJarak;
+        /** Langkah-langkah eksplorasi untuk animasi */
+        public List<LangkahAnimasi> langkahList;
+        /** Mapping parent untuk setiap node (untuk highlight edge) */
+        public java.util.Map<String, String> parentMap;
+
+        public HasilAnimasi(List<String> path, int totalJarak, List<LangkahAnimasi> langkahList, java.util.Map<String, String> parentMap) {
+            this.path = path;
+            this.totalJarak = totalJarak;
+            this.langkahList = langkahList;
+            this.parentMap = parentMap;
         }
     }
 
@@ -321,5 +372,113 @@ public class RouteOptimizer {
 
         int hasil = jarak.getOrDefault(tujuan, Integer.MAX_VALUE);
         return (hasil == Integer.MAX_VALUE) ? -1 : hasil; // -1 = tidak ada jalur
+    }
+
+    /**
+     * Menjalankan algoritma Dijkstra dan merekam SEMUA langkah eksplorasi
+     * untuk keperluan animasi visual di MapPanel.
+     *
+     * Setiap kali sebuah node diproses (dipoll dari Min-Heap) atau sebuah
+     * edge di-relax (jarak tetangga diperbarui), langkah tersebut dicatat
+     * ke dalam list untuk dianimasikan secara bertahap.
+     *
+     * @param graph  objek Graph yang merepresentasikan peta
+     * @param asal   nama node asal
+     * @param tujuan nama node tujuan
+     * @return HasilAnimasi berisi path, total jarak, dan langkah-langkah animasi
+     */
+    public static HasilAnimasi hitungDijkstraDenganAnimasi(Graph graph, String asal, String tujuan) {
+        List<LangkahAnimasi> langkahList = new ArrayList<>();
+        java.util.Map<String, String> parentMap = new java.util.HashMap<>();
+
+        // Validasi input
+        if (!graph.containsNode(asal)) {
+            System.out.println("[ERROR] Node asal '" + asal + "' tidak ditemukan di graph!");
+            return new HasilAnimasi(new ArrayList<>(), -1, langkahList, parentMap);
+        }
+        if (!graph.containsNode(tujuan)) {
+            System.out.println("[ERROR] Node tujuan '" + tujuan + "' tidak ditemukan di graph!");
+            return new HasilAnimasi(new ArrayList<>(), -1, langkahList, parentMap);
+        }
+        if (asal.equals(tujuan)) {
+            List<String> path = new ArrayList<>();
+            path.add(asal);
+            return new HasilAnimasi(path, 0, langkahList, parentMap);
+        }
+
+        // Inisialisasi Dijkstra
+        HashMap<String, Integer> jarak = new HashMap<>();
+        Set<String> visited = new HashSet<>();
+        PriorityQueue<NodeJarak> minHeap = new PriorityQueue<>(Comparator.comparingInt(nj -> nj.jarak));
+
+        for (String node : graph.getAllNodes()) {
+            jarak.put(node, Integer.MAX_VALUE);
+        }
+        jarak.put(asal, 0);
+        minHeap.offer(new NodeJarak(asal, 0));
+
+        // Catat langkah inisialisasi
+        langkahList.add(new LangkahAnimasi(asal, null, 0, "INIT", null));
+
+        // Loop utama Dijkstra dengan perekaman langkah
+        while (!minHeap.isEmpty()) {
+            NodeJarak current = minHeap.poll();
+            String currentNode = current.namaNode;
+            int currentJarak = current.jarak;
+
+            if (visited.contains(currentNode)) continue;
+            visited.add(currentNode);
+
+            // Catat langkah VISIT: node ini sedang diproses
+            String parent = parentMap.getOrDefault(currentNode, (currentNode.equals(asal) ? null : "unknown"));
+            langkahList.add(new LangkahAnimasi(currentNode, parent, currentJarak, "VISIT", null));
+
+            if (currentNode.equals(tujuan)) break;
+
+            for (Edge edge : graph.getNeighbors(currentNode)) {
+                String neighbor = edge.getDestination();
+                int bobot = edge.getWeight();
+
+                if (visited.contains(neighbor)) continue;
+
+                int jarakBaru = currentJarak + bobot;
+                if (jarakBaru < jarak.get(neighbor)) {
+                    jarak.put(neighbor, jarakBaru);
+                    parentMap.put(neighbor, currentNode);
+                    minHeap.offer(new NodeJarak(neighbor, jarakBaru));
+
+                    // Catat langkah RELAX: jarak ke neighbor diperbarui
+                    langkahList.add(new LangkahAnimasi(currentNode, currentNode, jarakBaru, "RELAX", neighbor));
+                }
+            }
+        }
+
+        // Rekonstruksi path
+        List<String> path = new ArrayList<>();
+        if (parentMap.containsKey(tujuan) || asal.equals(tujuan)) {
+            String step = tujuan;
+            while (step != null) {
+                path.add(step);
+                step = parentMap.get(step);
+            }
+            Collections.reverse(path);
+        }
+
+        int totalJarak = jarak.getOrDefault(tujuan, Integer.MAX_VALUE);
+        if (totalJarak == Integer.MAX_VALUE) totalJarak = -1;
+
+        // Catat langkah akhir: path ditemukan
+        langkahList.add(new LangkahAnimasi(tujuan, null, totalJarak, "FINISH", null));
+
+        System.out.println("========================================");
+        System.out.println("   HASIL PENCARIAN RUTE TERPENDEK (ANIMASI)");
+        System.out.println("========================================");
+        System.out.println("Dari   : " + asal);
+        System.out.println("Ke     : " + tujuan);
+        System.out.println("Total jarak: " + totalJarak);
+        System.out.println("Jumlah langkah animasi: " + langkahList.size());
+        System.out.println("========================================");
+
+        return new HasilAnimasi(path, totalJarak, langkahList, parentMap);
     }
 }
