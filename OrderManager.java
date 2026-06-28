@@ -230,7 +230,7 @@ public class OrderManager {
             // Ambil snapshot terurut — tidak mengubah antrian asli
             List<DeliveryOrder> snapshot = sortOrdersByDeadline();
             for (int i = 0; i < snapshot.size(); i++) {
-                System.out.printf("║  %2d. %s%n", (i + 1), snapshot.get(i).toString());
+                System.out.printf("|  %2d. %s%n", (i + 1), snapshot.get(i).toString());
             }
         }
 
