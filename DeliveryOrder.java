@@ -8,31 +8,8 @@
  * di OrderManager dapat mengurutkannya otomatis berdasarkan
  * deadlineTime (pesanan paling mendesak = prioritas tertinggi).
  *
- * ============================================================
- * KETERKAITAN DENGAN MODUL LAIN:
- * ============================================================
- *
- * ► Graph.java (Anggota 1):
- * Kedua field node di bawah WAJIB sinkron dengan nama node
- * yang ada di dalam Graph agar tidak terjadi error saat proses.
- *
- * ► RouteOptimizer.java (Anggota 1):
- * RouteOptimizer.hitungDijkstra(graph, asal, tujuan) membutuhkan
- * DUA titik: asal dan tujuan. Field di class ini menyuplai keduanya:
- *
- * restaurantNode → parameter "asal" di hitungDijkstra()
- * destinationNode → parameter "tujuan" di hitungDijkstra()
- *
- * Contoh pemanggilan dari OrderManager:
- * RouteOptimizer.hitungDijkstra(
- * graph,
- * order.getRestaurantNode(), // "asal"
- * order.getDestinationNode() // "tujuan"
- * );
- *
- * ► OrderManager.java (Anggota 2 - file ini sendiri):
- * Disimpan dalam PriorityQueue<DeliveryOrder> dan diurutkan
- * otomatis melalui compareTo() berdasarkan deadlineTime.
+ * restaurantNode untuk parameter "asal" di hitungDijkstra()
+ * destinationNode untuk parameter "tujuan" di hitungDijkstra()
  *
  * Modul : Manajemen Pesanan (Sorting & Priority)
  * Anggota : Anggota 2
