@@ -6,44 +6,14 @@ import java.util.Scanner;
  * ============================================================
  *
  * Kelas pembantu (utility) dengan semua metode STATIS.
- * Tidak perlu di-instansiasi — langsung panggil:
+ * Tidak perlu di-instansiasi atau langsung panggil:
  * int n = InputValidator.readPositiveInt(sc, "Masukkan deadline: ");
  *
  * Tujuan utama: membungkus Scanner agar program TIDAK CRASH
  * ketika pengguna memasukkan tipe data yang salah.
  * Contoh masalah: program minta angka, pengguna ketik "abc"
- * → tanpa validasi: NumberFormatException / InputMismatchException
- * → dengan kelas ini: tampil pesan error, lalu minta input ulang
- *
- * ============================================================
- * KETERKAITAN DENGAN MODUL LAIN:
- * ============================================================
- *
- * ► Graph.java (Anggota 1):
- * readNodeName() → validasi node ke Graph.containsNode()
- * isValidNode() → cek non-interaktif via Graph.containsNode()
- *
- * ► RouteOptimizer.java (Anggota 1):
- * readAsalDanTujuan() → membaca sepasang node (asal + tujuan)
- * sekaligus, lalu memvalidasi keduanya ke Graph. Hasilnya
- * siap langsung dipakai sebagai argumen hitungDijkstra().
- *
- * ► DeliveryOrder.java (Anggota 2):
- * buildOrderFromInput() → membangun objek DeliveryOrder lengkap
- * dari input keyboard yang sudah tervalidasi, termasuk validasi
- * restaurantNode dan destinationNode ke Graph.
- *
- * ► MenuGUI.java (Anggota 3) — cara pakai yang disarankan:
- *
- * // Baca pilihan menu angka aman:
- * int pilihan = InputValidator.readIntInRange(sc, "Pilih (1-5): ", 1, 5);
- *
- * // Bangun pesanan baru langsung dari keyboard:
- * DeliveryOrder pesanan = InputValidator.buildOrderFromInput(sc, graph);
- *
- * // Atau ambil sepasang node asal-tujuan:
- * String[] nodes = InputValidator.readAsalDanTujuan(sc, graph);
- * RouteOptimizer.hitungDijkstra(graph, nodes[0], nodes[1]);
+ * jika tanpa validasi: NumberFormatException / InputMismatchException
+ * dengan kelas ini: tampil pesan error, lalu minta input ulang
  *
  * Modul : Manajemen Pesanan (Sorting & Priority)
  * Anggota : Anggota 2
@@ -211,10 +181,10 @@ public class InputValidator {
     }
 
     /**
-     * ═══════════════════════════════════════════════════════════
+     * ============================================================
      * METODE INTEGRASI: Baca sepasang node Asal + Tujuan
      * untuk langsung digunakan di RouteOptimizer.hitungDijkstra()
-     * ═══════════════════════════════════════════════════════════
+     * ============================================================
      *
      * Membaca DUA node sekaligus (asal dan tujuan), keduanya
      * divalidasi ke Graph. Hasilnya bisa langsung dipakai
@@ -238,9 +208,9 @@ public class InputValidator {
     // ==================== BANGUN DELIVERY ORDER ====================
 
     /**
-     * ═══════════════════════════════════════════════════════════
+     * ============================================================
      * METODE FACTORY: Bangun DeliveryOrder dari input keyboard
-     * ═══════════════════════════════════════════════════════════
+     * ============================================================
      *
      * Membaca semua field yang dibutuhkan untuk membuat DeliveryOrder
      * baru dari pengguna, dengan validasi penuh di setiap field.
