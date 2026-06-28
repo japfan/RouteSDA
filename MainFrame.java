@@ -129,7 +129,7 @@ public class MainFrame extends JFrame {
         p.add(txtDestination);
         p.add(Box.createVerticalStrut(6));
 
-        p.add(lbl("Weight (jarak/waktu)"));
+        p.add(lbl("Deadline (menit)"));
         txtDeadline = field("30");
         p.add(txtDeadline);
         p.add(Box.createVerticalStrut(10));
@@ -338,7 +338,7 @@ public class MainFrame extends JFrame {
                 lblStatus.setForeground(GREEN);
 
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Weight harus berupa angka.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Deadline harus berupa angka.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -382,7 +382,7 @@ public class MainFrame extends JFrame {
                 "  Pelanggan   : " + top.getCustomerName() + "\n" +
                 "  Dari        : " + asal + "\n" +
                 "  Tujuan      : " + tujuan + "\n" +
-                "  Weight       : " + top.getDeadlineTime() + "\n\n" +
+                "  Deadline    : " + top.getDeadlineTime() + " menit\n\n" +
                 "Rute Terpendek:\n" +
                 "  " + sb.toString() + "\n\n" +
                 "Total Jarak   : " + hasil.totalJarak + " meter\n" +
@@ -418,7 +418,7 @@ public class MainFrame extends JFrame {
                 sb.append(n++).append(". [").append(o.getOrderId()).append("] ")
                   .append(o.getCustomerName()).append("\n")
                   .append("   Tujuan: ").append(o.getDestinationNode())
-                  .append("  |  Weight: ").append(o.getDeadlineTime()).append("\n\n");
+                  .append("  |  Deadline: ").append(o.getDeadlineTime()).append(" mnt\n\n");
             }
             txtAreaAntrean.setText(sb.toString());
         }
