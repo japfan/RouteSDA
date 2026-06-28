@@ -1,3 +1,4 @@
+
 /**
  * ============================================================
  * MainFrame.java - Dashboard Visual Sistem Optimasi Pengiriman
@@ -27,18 +28,18 @@ public class MainFrame extends JFrame {
         // 1. Instansiasi Data Core Proyek & Jalankan Seeder
         graph = new Graph();
         orderManager = new OrderManager();
-        MapSeeder.seedMap(graph, orderManager); 
+        MapSeeder.seedMap(graph, orderManager);
 
         // 2. Properti Jendela Utama (Window)
         setTitle("Sistem Optimasi Rute Pengiriman Makanan - Dashboard Logistik");
         setSize(950, 650);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); 
+        setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
 
         // 3. Membangun Komponen Tampilan
         initComponents();
-        
+
         // 4. Sinkronisasi Data Awal ke Layar Visual
         updatePetaDisplay();
         updateAntreanDisplay();
@@ -48,28 +49,32 @@ public class MainFrame extends JFrame {
         // ==================== PANEL KIRI (INPUT FORM & ANTREAN) ====================
         JPanel panelKiri = new JPanel(new BorderLayout(5, 5));
         panelKiri.setPreferredSize(new Dimension(380, 0));
-        
+
         JPanel panelInput = new JPanel(new GridLayout(6, 2, 5, 5));
         panelInput.setBorder(BorderFactory.createTitledBorder("Input Pesanan Baru"));
-        
+
         panelInput.add(new JLabel(" Order ID:"));
-        txtOrderId = new JTextField(); panelInput.add(txtOrderId);
-        
+        txtOrderId = new JTextField();
+        panelInput.add(txtOrderId);
+
         panelInput.add(new JLabel(" Nama Pelanggan:"));
-        txtCustomerName = new JTextField(); panelInput.add(txtCustomerName);
+        txtCustomerName = new JTextField();
+        panelInput.add(txtCustomerName);
 
         panelInput.add(new JLabel(" Node Restoran (Asal):"));
         txtRestaurant = new JTextField("Restoran");
         panelInput.add(txtRestaurant);
-        
+
         panelInput.add(new JLabel(" Node Tujuan (Rumah):"));
-        txtDestination = new JTextField(); panelInput.add(txtDestination);
-        
+        txtDestination = new JTextField();
+        panelInput.add(txtDestination);
+
         panelInput.add(new JLabel(" Deadline (Menit):"));
-        txtDeadline = new JTextField(); panelInput.add(txtDeadline);
-        
+        txtDeadline = new JTextField();
+        panelInput.add(txtDeadline);
+
         JButton btnTambah = new JButton("Tambah Pesanan");
-        panelInput.add(new JLabel("")); 
+        panelInput.add(new JLabel(""));
         panelInput.add(btnTambah);
         panelKiri.add(panelInput, BorderLayout.NORTH);
 
@@ -77,12 +82,12 @@ public class MainFrame extends JFrame {
         JScrollPane scrollAntrean = new JScrollPane(txtAreaAntrean);
         scrollAntrean.setBorder(BorderFactory.createTitledBorder("Daftar Antrean (Priority Min-Heap By Deadline)"));
         panelKiri.add(scrollAntrean, BorderLayout.CENTER);
-        
+
         add(panelKiri, BorderLayout.WEST);
 
         // ==================== PANEL KANAN (MAP & LOGISTIK RUTE) ====================
         JPanel panelKanan = new JPanel(new GridLayout(2, 1, 5, 5));
-        
+
         txtAreaPeta = new ReadOnlyTextArea("");
         JScrollPane scrollPeta = new JScrollPane(txtAreaPeta);
         scrollPeta.setBorder(BorderFactory.createTitledBorder("Informasi Jaringan Jalan (Adjacency List Peta)"));
@@ -93,11 +98,11 @@ public class MainFrame extends JFrame {
         btnProses.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnProses.setBackground(new Color(46, 204, 113));
         btnProses.setForeground(Color.WHITE);
-        
+
         txtAreaRute = new ReadOnlyTextArea("Belum ada rute yang diproses.");
         JScrollPane scrollRute = new JScrollPane(txtAreaRute);
         scrollRute.setBorder(BorderFactory.createTitledBorder("Console Navigasi / Hasil Optimasi Rute Dijkstra"));
-        
+
         panelProsesRute.add(btnProses, BorderLayout.NORTH);
         panelProsesRute.add(scrollRute, BorderLayout.CENTER);
         panelKanan.add(panelProsesRute);
@@ -105,7 +110,7 @@ public class MainFrame extends JFrame {
         add(panelKanan, BorderLayout.CENTER);
 
         // ==================== AKSI TOMBOL (INTEGRASI FITUR) ====================
-        
+
         btnTambah.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -117,14 +122,40 @@ public class MainFrame extends JFrame {
                     String deadlineText = txtDeadline.getText().trim();
 
                     if (id.isEmpty() || name.isEmpty() || rest.isEmpty() || dest.isEmpty() || deadlineText.isEmpty()) {
-                        JOptionPane.showMessageDialog(MainFrame.this, "Semua kolom input wajib diisi!", "Peringatan", JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(MainFrame.this, "Semua kolom input wajib diisi!", "Peringatan",
+                                JOptionPane.WARNING_MESSAGE);
                         return;
                     }
 
                     int deadline = Integer.parseInt(deadlineText);
+
+                    // FIX 1: Validasi deadline harus lebih dari 0
+                    if (deadline <= 0) {
+                        JOptionPane.showMessageDialog(MainFrame.this,
+                                "Deadline harus lebih dari 0 menit!",
+                                "Kesalahan Input", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    // FIX 2: Validasi node ke Graph dengan pesan error spesifik
+                    if (!graph.containsNode(rest)) {
+                        JOptionPane.showMessageDialog(MainFrame.this,
+                                "Node Restoran/Asal \"" + rest + "\" tidak terdaftar di peta!\n\n"
+                                        + "Node yang tersedia:\n" + graph.getAllNodes(),
+                                "Kesalahan Validasi Peta", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    if (!graph.containsNode(dest)) {
+                        JOptionPane.showMessageDialog(MainFrame.this,
+                                "Node Tujuan \"" + dest + "\" tidak terdaftar di peta!\n\n"
+                                        + "Node yang tersedia:\n" + graph.getAllNodes(),
+                                "Kesalahan Validasi Peta", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
                     DeliveryOrder order = new DeliveryOrder(id, name, rest, dest, deadline);
-                    
-                    // Memanggil validasi penuh milik Anggota 2
+
+                    // Memanggil validasi penuh milik Anggota 2 (node sudah dicek di atas)
                     boolean sukses = orderManager.addOrder(order, graph);
 
                     if (sukses) {
@@ -134,10 +165,13 @@ public class MainFrame extends JFrame {
                         txtDestination.setText("");
                         txtDeadline.setText("");
                     } else {
-                        JOptionPane.showMessageDialog(MainFrame.this, "Gagal menambahkan pesanan! Pastikan Node Asal & Tujuan terdaftar di peta.", "Kesalahan Validasi Peta", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(MainFrame.this,
+                                "Gagal menambahkan pesanan! Silakan coba lagi.",
+                                "Kesalahan", JOptionPane.ERROR_MESSAGE);
                     }
                 } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(MainFrame.this, "Input Deadline harus berupa angka bulat!", "Kesalahan Input", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(MainFrame.this, "Input Deadline harus berupa angka bulat!",
+                            "Kesalahan Input", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -145,12 +179,20 @@ public class MainFrame extends JFrame {
         btnProses.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // FIX 4: Ambil topOrder sekali, teruskan ke cariRuteTopOrder — hindari panggil
+                // getTopOrder() ganda
                 DeliveryOrder topOrder = orderManager.getTopOrder();
-                
+
                 if (topOrder != null) {
-                    // Sinkronisasi Terintegrasi penuh ke modul logistik kurir
                     List<String> ruteList = orderManager.cariRuteTopOrder(graph);
-                    
+
+                    // FIX 3: Hitung total jarak via RouteOptimizer.hitungTotalJarak()
+                    // agar angka jarak tampil di GUI, bukan hanya di console
+                    int totalJarak = RouteOptimizer.hitungTotalJarak(
+                            graph,
+                            topOrder.getRestaurantNode(),
+                            topOrder.getDestinationNode());
+
                     StringBuilder sb = new StringBuilder();
                     sb.append("========================================\n");
                     sb.append("   HASIL NAVIGASI KURIR (DIJKSTRA)\n");
@@ -161,36 +203,43 @@ public class MainFrame extends JFrame {
                     sb.append("Titik Antar : ").append(topOrder.getDestinationNode()).append("\n");
                     sb.append("----------------------------------------\n");
                     sb.append("RUTE TERCEPAT:\n");
-                    
-                    if(ruteList.isEmpty()) {
+
+                    if (ruteList.isEmpty()) {
                         sb.append("Tidak ditemukan rute/jalur penghubung di dalam peta!\n");
                     } else {
                         for (int i = 0; i < ruteList.size(); i++) {
                             sb.append(ruteList.get(i));
-                            if (i < ruteList.size() - 1) sb.append(" -> ");
+                            if (i < ruteList.size() - 1)
+                                sb.append(" -> ");
                         }
                         sb.append("\n");
+                        sb.append("----------------------------------------\n");
+                        sb.append("Total Jarak : ").append(totalJarak).append(" satuan\n");
                     }
                     sb.append("========================================\n");
-                    
+
                     txtAreaRute.setText(sb.toString());
-                    
+
                     // Selesai diproses kurir, pesanan dihapus dari Heap
                     orderManager.removeOrder();
                     updateAntreanDisplay();
                 } else {
-                    JOptionPane.showMessageDialog(MainFrame.this, "Antrean pengiriman kosong!", "Informasi", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(MainFrame.this, "Antrean pengiriman kosong!", "Informasi",
+                            JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         });
     }
 
     /**
-     * Membaca representasi graf internal dan mencetaknya menjadi struktur Adjacency List pada GUI.
+     * Membaca representasi graf internal dan mencetaknya menjadi struktur Adjacency
+     * List pada GUI.
      * * ANALISIS KOMPLEKSITAS WAKTU:
      * O(V + E) di mana V adalah jumlah Node dan E adalah jumlah Sisi/Jalan (Edge).
-     * Fungsi ini mengiterasi setiap node yang ada di graf (O(V)) lalu mengambil seluruh tetangga
-     * dari node tersebut (O(E)) untuk dirender dalam bentuk teks ke dalam komponen visual Swing JTextArea.
+     * Fungsi ini mengiterasi setiap node yang ada di graf (O(V)) lalu mengambil
+     * seluruh tetangga
+     * dari node tersebut (O(E)) untuk dirender dalam bentuk teks ke dalam komponen
+     * visual Swing JTextArea.
      */
     private void updatePetaDisplay() {
         StringBuilder sb = new StringBuilder();
@@ -202,10 +251,11 @@ public class MainFrame extends JFrame {
             List<Edge> edges = graph.getNeighbors(node);
             for (int i = 0; i < edges.size(); i++) {
                 sb.append(edges.get(i).getDestination())
-                  .append(" (bobot: ")
-                  .append(edges.get(i).getWeight())
-                  .append(")");
-                if (i < edges.size() - 1) sb.append(", ");
+                        .append(" (bobot: ")
+                        .append(edges.get(i).getWeight())
+                        .append(")");
+                if (i < edges.size() - 1)
+                    sb.append(", ");
             }
             sb.append("]\n");
         }
@@ -213,12 +263,16 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * Mengambil snapshot antrean berprioritas dan memperbarui daftar tampilan teks di layar GUI.
+     * Mengambil snapshot antrean berprioritas dan memperbarui daftar tampilan teks
+     * di layar GUI.
      * * ANALISIS KOMPLEKSITAS WAKTU:
      * O(N log N) di mana N adalah total jumlah pesanan yang aktif di dalam antrean.
-     * Untuk menampilkan data secara berurutan di layar tanpa merusak struktur asli Min-Heap dari 
-     * PriorityQueue, fungsi memanggil orderManager.sortOrdersByDeadline() yang melakukan duplikasi 
-     * array dan melakukan pengurutan ulang menggunakan Timsort (O(N log N)), kemudian mencetak string 
+     * Untuk menampilkan data secara berurutan di layar tanpa merusak struktur asli
+     * Min-Heap dari
+     * PriorityQueue, fungsi memanggil orderManager.sortOrdersByDeadline() yang
+     * melakukan duplikasi
+     * array dan melakukan pengurutan ulang menggunakan Timsort (O(N log N)),
+     * kemudian mencetak string
      * sebanyak O(N) ke GUI.
      */
     private void updateAntreanDisplay() {
@@ -230,7 +284,7 @@ public class MainFrame extends JFrame {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("Total pesanan aktif: %d\n", orderManager.getSize()));
         sb.append("----------------------------------------------------------------------\n");
-        
+
         List<DeliveryOrder> snapshot = orderManager.sortOrdersByDeadline();
         for (int i = 0; i < snapshot.size(); i++) {
             sb.append(String.format("%d. %s\n", (i + 1), snapshot.get(i).toString()));
@@ -239,7 +293,8 @@ public class MainFrame extends JFrame {
     }
 }
 
-// Komponen Tambahan untuk Mengunci Text Area agar tidak bisa dimodifikasi manual oleh user
+// Komponen Tambahan untuk Mengunci Text Area agar tidak bisa dimodifikasi
+// manual oleh user
 class ReadOnlyTextArea extends JTextArea {
     public ReadOnlyTextArea(String text) {
         super(text);
