@@ -1,3 +1,10 @@
+/**
+ * ============================================================
+ * Main.java - Entry Point Aplikasi Berbasis GUI
+ * ============================================================
+ * Modul   : Modul Antarmuka & Integrasi (GUI & Main)
+ * Anggota : Anggota 3
+ */
 import javax.swing.SwingUtilities;
 
 public class Main {
