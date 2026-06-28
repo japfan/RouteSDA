@@ -19,7 +19,7 @@ import java.util.Set;
  * mengoptimalkan pemilihan node dengan jarak terkecil pada
  * setiap iterasi.
  * 
- * Modul   : Peta & Algoritma Rute (Core Graph)
+ * Modul : Peta & Algoritma Rute (Core Graph)
  * Anggota : Anggota 1
  * 
  * @author Anggota 1
@@ -49,66 +49,66 @@ public class RouteOptimizer {
      * ===========================================================================
      *
      * Notasi:
-     *   V = jumlah node (vertex) dalam graph
-     *   E = jumlah edge (sisi) dalam graph
+     * V = jumlah node (vertex) dalam graph
+     * E = jumlah edge (sisi) dalam graph
      *
      * ---------------------------------------------------------------------------
      * TAHAP 1: INISIALISASI
      * ---------------------------------------------------------------------------
-     *   - Membuat HashMap untuk jarak    : O(V)
-     *   - Membuat HashMap untuk previous : O(V)
-     *   - Membuat HashSet untuk visited  : O(1)
-     *   - Memasukkan node asal ke PQ     : O(log 1) = O(1)
-     *   Total inisialisasi               : O(V)
+     * - Membuat HashMap untuk jarak : O(V)
+     * - Membuat HashMap untuk previous : O(V)
+     * - Membuat HashSet untuk visited : O(1)
+     * - Memasukkan node asal ke PQ : O(log 1) = O(1)
+     * Total inisialisasi : O(V)
      *
      * ---------------------------------------------------------------------------
      * TAHAP 2: LOOP UTAMA (PROSES DIJKSTRA)
      * ---------------------------------------------------------------------------
-     *   Pada setiap iterasi:
-     *     a) Mengambil elemen terkecil dari PriorityQueue (poll):
-     *        - Operasi poll pada Min-Heap    : O(log V)
-     *        - Dilakukan paling banyak V kali: total O(V log V)
+     * Pada setiap iterasi:
+     * a) Mengambil elemen terkecil dari PriorityQueue (poll):
+     * - Operasi poll pada Min-Heap : O(log V)
+     * - Dilakukan paling banyak V kali: total O(V log V)
      *
-     *     b) Memeriksa semua tetangga (neighbors) dari node terpilih:
-     *        - Setiap edge diperiksa tepat 1x (karena visited set)
-     *        - Untuk setiap edge yang meng-update jarak, dilakukan
-     *          operasi offer (insert) ke PriorityQueue: O(log V)
-     *        - Total untuk semua edge         : O(E log V)
+     * b) Memeriksa semua tetangga (neighbors) dari node terpilih:
+     * - Setiap edge diperiksa tepat 1x (karena visited set)
+     * - Untuk setiap edge yang meng-update jarak, dilakukan
+     * operasi offer (insert) ke PriorityQueue: O(log V)
+     * - Total untuk semua edge : O(E log V)
      *
-     *   Total loop utama: O(V log V) + O(E log V) = O((V + E) log V)
+     * Total loop utama: O(V log V) + O(E log V) = O((V + E) log V)
      *
      * ---------------------------------------------------------------------------
      * TAHAP 3: REKONSTRUKSI PATH
      * ---------------------------------------------------------------------------
-     *   - Menelusuri HashMap previous dari tujuan ke asal: O(V) worst case
-     *   - Membalik list (Collections.reverse)             : O(V)
-     *   Total rekonstruksi                                : O(V)
+     * - Menelusuri HashMap previous dari tujuan ke asal: O(V) worst case
+     * - Membalik list (Collections.reverse) : O(V)
+     * Total rekonstruksi : O(V)
      *
      * ---------------------------------------------------------------------------
      * TOTAL KOMPLEKSITAS WAKTU:
-     *   T(V, E) = O(V) + O((V + E) log V) + O(V)
-     *           = O((V + E) log V)
+     * T(V, E) = O(V) + O((V + E) log V) + O(V)
+     * = O((V + E) log V)
      *
      * Untuk graph terhubung dimana E >= V - 1:
-     *   T(V, E) = O(E log V)
+     * T(V, E) = O(E log V)
      *
      * ---------------------------------------------------------------------------
      * KOMPLEKSITAS RUANG (SPACE COMPLEXITY):
-     *   - HashMap jarak     : O(V)
-     *   - HashMap previous  : O(V)
-     *   - HashSet visited   : O(V)
-     *   - PriorityQueue     : O(V) pada kasus terburuk (bisa sampai O(E)
-     *                         karena lazy deletion, tapi dibatasi oleh visited)
-     *   Total               : O(V + E)
+     * - HashMap jarak : O(V)
+     * - HashMap previous : O(V)
+     * - HashSet visited : O(V)
+     * - PriorityQueue : O(V) pada kasus terburuk (bisa sampai O(E)
+     * karena lazy deletion, tapi dibatasi oleh visited)
+     * Total : O(V + E)
      *
      * ===========================================================================
      * PERBANDINGAN DENGAN IMPLEMENTASI TANPA MIN-HEAP:
      * ===========================================================================
-     *   - Tanpa Min-Heap (array biasa)  : O(V^2)
-     *   - Dengan Min-Heap (PriorityQueue): O((V + E) log V)
-     *   
-     *   Untuk graph sparse (E << V^2), implementasi Min-Heap jauh lebih efisien.
-     *   Untuk graph dense  (E ≈ V^2),  keduanya sebanding.
+     * - Tanpa Min-Heap (array biasa) : O(V^2)
+     * - Dengan Min-Heap (PriorityQueue): O((V + E) log V)
+     * 
+     * Untuk graph sparse (E << V^2), implementasi Min-Heap jauh lebih efisien.
+     * Untuk graph dense (E ≈ V^2), keduanya sebanding.
      * ===========================================================================
      */
 
@@ -162,8 +162,7 @@ public class RouteOptimizer {
 
         // Min-Heap: selalu mengambil node dengan jarak terkecil terlebih dahulu
         PriorityQueue<NodeJarak> minHeap = new PriorityQueue<>(
-            Comparator.comparingInt(nj -> nj.jarak)
-        );
+                Comparator.comparingInt(nj -> nj.jarak));
 
         // Inisialisasi semua jarak ke INFINITY, kecuali node asal = 0
         for (String node : graph.getAllNodes()) {
@@ -267,5 +266,60 @@ public class RouteOptimizer {
         System.out.println("========================================");
 
         return path;
+    }
+
+    /**
+     * Menghitung TOTAL JARAK terpendek dari node asal ke node tujuan.
+     *
+     * Dipisah dari hitungDijkstra() agar MainFrame (GUI) dapat menampilkan
+     * angka jarak langsung di layar tanpa hanya mengandalkan output console.
+     *
+     * Menggunakan logika Dijkstra yang sama namun tanpa rekonstruksi path
+     * dan tanpa output console — murni mengembalikan nilai integer.
+     *
+     * @param graph  objek Graph peta
+     * @param asal   nama node asal
+     * @param tujuan nama node tujuan
+     * @return total jarak terpendek (int), atau -1 jika tidak ada jalur
+     */
+    public static int hitungTotalJarak(Graph graph, String asal, String tujuan) {
+        // Validasi node
+        if (!graph.containsNode(asal) || !graph.containsNode(tujuan))
+            return -1;
+        if (asal.equals(tujuan))
+            return 0;
+
+        HashMap<String, Integer> jarak = new HashMap<>();
+        Set<String> visited = new HashSet<>();
+        PriorityQueue<NodeJarak> minHeap = new PriorityQueue<>(
+                Comparator.comparingInt(nj -> nj.jarak));
+
+        // Inisialisasi semua jarak ke INFINITY
+        for (String node : graph.getAllNodes())
+            jarak.put(node, Integer.MAX_VALUE);
+        jarak.put(asal, 0);
+        minHeap.offer(new NodeJarak(asal, 0));
+
+        while (!minHeap.isEmpty()) {
+            NodeJarak current = minHeap.poll();
+            if (visited.contains(current.namaNode))
+                continue;
+            visited.add(current.namaNode);
+            if (current.namaNode.equals(tujuan))
+                break; // Early exit
+
+            for (Edge edge : graph.getNeighbors(current.namaNode)) {
+                if (visited.contains(edge.getDestination()))
+                    continue;
+                int jarakBaru = current.jarak + edge.getWeight();
+                if (jarakBaru < jarak.getOrDefault(edge.getDestination(), Integer.MAX_VALUE)) {
+                    jarak.put(edge.getDestination(), jarakBaru);
+                    minHeap.offer(new NodeJarak(edge.getDestination(), jarakBaru));
+                }
+            }
+        }
+
+        int hasil = jarak.getOrDefault(tujuan, Integer.MAX_VALUE);
+        return (hasil == Integer.MAX_VALUE) ? -1 : hasil; // -1 = tidak ada jalur
     }
 }
