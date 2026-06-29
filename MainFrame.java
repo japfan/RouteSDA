@@ -8,7 +8,7 @@ public class MainFrame extends JFrame {
     private MapPanel mapPanel;
     private JTextArea txtAreaAntrean;
     private JTextArea txtAreaRute;
-    private JTextField txtOrderId, txtCustomerName, txtDestination, txtDeadline;
+    private JTextField txtOrderId, txtCustomerName, txtStartNode, txtDestination, txtDeadline;
     private JButton btnTambah, btnProses;
     private JLabel lblStatus;
 
@@ -105,7 +105,7 @@ public class MainFrame extends JFrame {
         p.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(BORDER, 1),
             BorderFactory.createEmptyBorder(12, 12, 12, 12)));
-        p.setMaximumSize(new Dimension(300, 255));
+        p.setMaximumSize(new Dimension(300, 31o));
 
         JLabel head = new JLabel("Input Pesanan Baru");
         head.setFont(new Font("SansSerif", Font.BOLD, 13));
@@ -122,6 +122,11 @@ public class MainFrame extends JFrame {
         p.add(lbl("Nama Pelanggan"));
         txtCustomerName = field("Dian");
         p.add(txtCustomerName);
+        p.add(Box.createVerticalStrut(6));
+
+        p.add(lbl("Lokasi Awal (Start Node)"));
+        txtStartNode = field("Restoran");
+        p.add(txtStartNode);
         p.add(Box.createVerticalStrut(6));
 
         p.add(lbl("Tujuan (Node Peta)"));
@@ -310,28 +315,39 @@ public class MainFrame extends JFrame {
     // ═══════════ LOGIC ═══════════
 
     private void wireButtons() {
+        // 1. Aksi Tambah Pesanan (Dengan Pilihan Lokasi Awal)
         btnTambah.addActionListener(e -> {
             try {
                 String id = txtOrderId.getText().trim();
                 String cust = txtCustomerName.getText().trim();
+                String start = txtStartNode.getText().trim();
                 String dest = txtDestination.getText().trim();
                 String dl = txtDeadline.getText().trim();
 
+                // Validasi input kosong
                 if (id.isEmpty() || cust.isEmpty() || dest.isEmpty() || dl.isEmpty()) {
                     JOptionPane.showMessageDialog(this, "Semua field harus diisi.", "Peringatan", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
+
+                // Validasi apakah Node Awal ada di peta
+                if (!graph.containsNode(start)) {
+                    JOptionPane.showMessageDialog(this, "Lokasi awal '" + start + "' tidak ditemukan di peta!", "Error Node", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // Validasi apakah Node Tujuan ada di peta
                 if (!graph.containsNode(dest)) {
-                    JOptionPane.showMessageDialog(this, "Node tidak ditemukan di peta.\nTersedia: " + String.join(", ", graph.getAllNodes()), "Gagal", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Lokasi tujuan '" + dest + "' tidak ditemukan di peta!", "Error Node", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
                 int deadline = Integer.parseInt(dl);
-                orderManager.addOrder(new DeliveryOrder(id, cust, "Restoran", dest, deadline), graph);
+                orderManager.addOrder(new DeliveryOrder(id, cust, start, dest, deadline), graph);
                 updateAntreanView();
                 mapPanel.resetAnimasi();
 
-                txtOrderId.setText(""); txtCustomerName.setText("");
+                txtOrderId.setText(""); txtCustomerName.setText(""); txtStartNode.setText("Restoran");
                 txtDestination.setText(""); txtDeadline.setText("");
 
                 lblStatus.setText("Pesanan [" + id + "] ditambahkan");
