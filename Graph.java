@@ -8,8 +8,7 @@ import java.util.Set;
  * Graf tidak berarah berbasis adjacency list (HashMap).
  *
  * Setiap edge berlaku dua arah — menambah edge A→B otomatis
- * menambah B→A dengan bobot yang sama. Node yang belum terdaftar
- * akan otomatis dibuat saat edge ditambahkan.
+ * menambah B→A dengan bobot yang sama. 
  *
  * Operasi dasar: O(1) untuk addNode/containsNode/getNeighbors
  * (HashMap lookup), O(degree) untuk iterasi tetangga.
@@ -31,7 +30,7 @@ public class Graph {
     public void addNode(String nodeName) {
         adjacencyList.putIfAbsent(nodeName, new ArrayList<>());
     }
-
+    
     /**
      * Tambah edge berbobot antara dua node. Karena graf tidak berarah,
      * edge ditambahkan di kedua sisi. Node dibuat otomatis jika belum ada.
@@ -64,28 +63,5 @@ public class Graph {
      */
     public boolean containsNode(String nodeName) {
         return adjacencyList.containsKey(nodeName);
-    }
-
-    /**
-     * Cetak isi graf ke console untuk debugging.
-     */
-    public void printGraph() {
-        System.out.println("========================================");
-        System.out.println("         PETA GRAPH (Adjacency List)    ");
-        System.out.println("========================================");
-
-        for (String node : adjacencyList.keySet()) {
-            System.out.print(node + " -> [");
-            List<Edge> edges = adjacencyList.get(node);
-            for (int i = 0; i < edges.size(); i++) {
-                System.out.print(edges.get(i));
-                if (i < edges.size() - 1) {
-                    System.out.print(", ");
-                }
-            }
-            System.out.println("]");
-        }
-
-        System.out.println("========================================");
     }
 }

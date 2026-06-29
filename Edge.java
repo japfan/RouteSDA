@@ -28,8 +28,5 @@ public class Edge {
         this.weight = weight;
     }
 
-    @Override
-    public String toString() {
-        return "-> " + destination + " (bobot: " + weight + ")";
-    }
+
 }
