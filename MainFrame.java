@@ -105,7 +105,7 @@ public class MainFrame extends JFrame {
         p.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(BORDER, 1),
             BorderFactory.createEmptyBorder(12, 12, 12, 12)));
-        p.setMaximumSize(new Dimension(300, 31o));
+        p.setMaximumSize(new Dimension(300, 310));
 
         JLabel head = new JLabel("Input Pesanan Baru");
         head.setFont(new Font("SansSerif", Font.BOLD, 13));
