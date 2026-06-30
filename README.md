@@ -8,19 +8,19 @@ Dikerjakan untuk tugas mata kuliah Struktur Data dan Algoritma, Tema 1: *Route O
 
 | No | Nama | NIM | Modul yang Dikerjakan |
 |----|------|-----|------------------------|
-| 1 | _Jaffan Arya Wirasena_ | _L0125017_ | Modul Peta & Algoritma Rute — `Edge.java`, `Graph.java`, `RouteOptimizer.java` |
-| 2 | _Daffa Gathfan Chaidar_ | _L0125077_ | Modul Manajemen Pesanan — `DeliveryOrder.java`, `OrderManager.java`, `InputValidator.java` |
-| 3 | _Habibi Ramadan_ | _L0125045_ | Modul Antarmuka & Integrasi — `Main.java`, `MainFrame.java`, `MapPanel.java`, `MapSeeder.java` |
+| 1 | _Jaffan Arya Wirasena_ | _L0125017_ | Modul Peta & Algoritma Rute ( `Edge.java`, `Graph.java`, `RouteOptimizer.java` )|
+| 2 | _Daffa Gathfan Chaidar_ | _L0125077_ | Modul Manajemen Pesanan ( `DeliveryOrder.java`, `OrderManager.java`, `InputValidator.java` )|
+| 3 | _Habibi Ramadan_ | _L0125045_ | Modul Antarmuka & Integrasi  (`Main.java`, `MainFrame.java`, `MapPanel.java`, `MapSeeder.java`) |
 
 
 ## Fitur Utama
 
-- **Visualisasi peta jaringan jalan** — peta perumahan digambarkan sebagai graph interaktif (`MapPanel`) berisi node lokasi dan edge jalan beserta bobot jaraknya.
+- **Visualisasi peta jaringan jalan** — peta digambarkan sebagai graph interaktif (`MapPanel`) berisi node lokasi dan edge jalan beserta bobot jaraknya.
 - **Input pesanan baru** — form pada panel kiri untuk menambahkan pesanan (Order ID, nama pelanggan, lokasi asal, tujuan, deadline), dengan validasi field kosong, validasi node ke peta, dan validasi format angka.
 - **Antrean pesanan terurut otomatis** — daftar pesanan selalu tampil terurut dari deadline paling mendesak, diperbarui otomatis setiap ada pesanan baru atau pesanan selesai diproses.
 - **Pencarian rute tercepat (Dijkstra)** — tombol "Cari Rute Tercepat" menghitung jalur terpendek dari restoran ke tujuan pesanan paling mendesak di antrean, menampilkan urutan node dan total jarak.
 - **Animasi proses pencarian rute** — tahap eksplorasi Dijkstra (node dikunjungi, edge di-relax) dan hasil rute terpendek digambar secara animasi di atas peta, tidak hanya ditampilkan sebagai teks.
-- **Auto-seed data simulasi** — `MapSeeder` otomatis mengisi 7 node, 11 edge (graph tidak berarah), dan 3 pesanan dummy saat program dijalankan, sehingga demo bisa langsung dilakukan tanpa input manual dari awal.
+- **Auto-seed data simulasi** — `MapSeeder` otomatis mengisi 7 node, 11 edge (graph tidak berarah), dan 3 pesanan dummy saat program dijalankan, sehingga demo bisa langsung dilakukan tanpa perlu input data manual.
 - **Penyelesaian pesanan otomatis** — setelah animasi rute selesai diputar, pesanan yang sedang diproses otomatis dihapus dari antrean.
 
 ## Struktur Data dan Algoritma
@@ -30,14 +30,14 @@ Dikerjakan untuk tugas mata kuliah Struktur Data dan Algoritma, Tema 1: *Route O
 | Struktur Data | Digunakan di | Operasi Kunci & Kompleksitas | Alasan Pemilihan |
 |---|---|---|---|
 | `HashMap<String, List<Edge>>` (adjacency list) | `Graph.java` | `addNode`/`containsNode`/`getNeighbors`: O(1) | Peta jalan bersifat tidak berarah dan sparse (jumlah edge jauh lebih kecil dari V²); adjacency list memakai ruang O(V+E), jauh lebih hemat dibanding adjacency matrix O(V²) |
-| `PriorityQueue<DeliveryOrder>` (binary min-heap) | `OrderManager.java` | `offer`: O(log n), `poll`: O(log n), `peek`: O(1) | Kurir perlu tahu pesanan paling mendesak setiap saat; min-heap menjaga urutan prioritas otomatis tanpa sorting ulang setiap ada perubahan, lebih efisien dari ArrayList yang butuh O(n) untuk mencari elemen termendesak |
+| `PriorityQueue<DeliveryOrder>` (binary min-heap) | `OrderManager.java` | `offer`: O(log n), `poll`: O(log n), `peek`: O(1) | Kurir perlu tahu pesanan paling mendesak setiap saat. min-heap menjaga urutan prioritas otomatis tanpa sorting ulang setiap ada perubahan, lebih efisien dari ArrayList yang butuh O(n) untuk mencari elemen termendesak |
 | `Comparable<DeliveryOrder>` (natural ordering) | `DeliveryOrder.java` | `compareTo`: O(1) | Mendefinisikan urutan berdasarkan `deadlineTime` agar `PriorityQueue` bisa membandingkan dua pesanan tanpa `Comparator` eksternal |
 | `HashMap` / `HashSet` (jarak, previous, visited) | `RouteOptimizer.java` | get/put/contains: O(1) | Menyimpan jarak sementara tiap node, jejak node sebelumnya untuk rekonstruksi rute, dan node yang statusnya sudah final selama Dijkstra berjalan |
 | `ArrayList` + `Collections.sort` (snapshot tampilan) | `OrderManager.sortOrdersByDeadline` | O(n log n) (TimSort) | Menghasilkan salinan daftar pesanan terurut untuk ditampilkan, tanpa mengubah struktur `PriorityQueue` asli yang sedang aktif |
 
 ### Algoritma
 
-**Dijkstra's Algorithm** (`RouteOptimizer.hitungDijkstra` / `hitungDijkstraDenganAnimasi`) — mencari rute terpendek dari node asal ke node tujuan dengan pendekatan greedy berbasis `PriorityQueue`. Dipilih karena seluruh bobot edge pada peta (jarak/waktu tempuh) bersifat non-negatif, sehingga Dijkstra menjamin hasil optimal dengan kompleksitas **O((V + E) log V)** — lebih efisien dibanding Bellman-Ford (O(V × E)) yang sebenarnya hanya diperlukan jika ada bobot negatif.
+**Dijkstra's Algorithm** (`RouteOptimizer.hitungDijkstra` / `hitungDijkstraDenganAnimasi`) mencari rute terpendek dari node asal ke node tujuan dengan pendekatan greedy berbasis `PriorityQueue`. Dipilih karena seluruh bobot edge pada peta (jarak/waktu tempuh) bersifat non-negatif, sehingga Dijkstra menjamin hasil optimal dengan kompleksitas **O((V + E) log V)** lebih efisien dibanding Bellman-Ford (O(V × E)) yang sebenarnya hanya diperlukan jika ada bobot negatif.
 
 **Lazy deletion pada min-heap** — saat sebuah node sudah dikunjungi namun entri lamanya masih tersisa di `PriorityQueue` (karena pernah di-`offer()` lebih dari sekali), entri tersebut cukup dilewati (`continue`) saat di-`poll()`, tanpa perlu dihapus eksplisit dari heap.
 
@@ -45,7 +45,7 @@ Dikerjakan untuk tugas mata kuliah Struktur Data dan Algoritma, Tema 1: *Route O
 
 ## Instalasi dan Menjalankan Program
 
-### Prasyarat
+### Syarat
 - JDK (Java Development Kit) versi 8 atau lebih baru, direkomendasikan JDK 11/17
 - Tidak ada library eksternal yang perlu diinstal (lihat bagian Library di bawah)
 

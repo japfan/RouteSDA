@@ -56,7 +56,7 @@ public class Graph {
      */
     public Set<String> getAllNodes() {
         return adjacencyList.keySet();
-    }
+    }   
 
     /**
      * Cek apakah node ada dalam graf.
