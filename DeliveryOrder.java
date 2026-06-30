@@ -10,55 +10,46 @@
  *
  * restaurantNode untuk parameter "asal" di hitungDijkstra()
  * destinationNode untuk parameter "tujuan" di hitungDijkstra()
- *
- * Modul : Manajemen Pesanan (Sorting & Priority)
- * Anggota : Anggota 2
- *
+ * 
+ * Modul: Manajemen pesanan (Sorting& Priority)
+ * 
  * @author Anggota 2
  */
 public class DeliveryOrder implements Comparable<DeliveryOrder> {
 
     // ==================== ATRIBUT ====================
 
-    /** ID unik pesanan. Format bebas, misal: "ORD-001" */
+    /* ID unik pesanan */
     private String orderId;
 
-    /** Nama pelanggan pemesan */
+    /* Nama pelanggan pemesan */
     private String customerName;
 
-    /**
-     * Node ASAL pengambilan (restoran/dapur/titik kumpul kurir).
-     * WAJIB ada di Graph (Anggota 1).
-     * → Dikirim sebagai parameter "asal" ke RouteOptimizer.hitungDijkstra()
-     */
+    /* Node ASAL pengambilan (restoran/dapur/titik kumpul kurir). */
     private String restaurantNode;
 
-    /**
-     * Node TUJUAN pengiriman (rumah pelanggan).
-     * WAJIB ada di Graph (Anggota 1) — dicek via Graph.containsNode().
-     * → Dikirim sebagai parameter "tujuan" ke RouteOptimizer.hitungDijkstra()
-     */
+    /* Node TUJUAN pengiriman (rumah pelanggan) */
     private String destinationNode;
 
     /**
      * Batas waktu pengiriman dalam satuan MENIT dari sekarang.
-     * Semakin kecil nilainya → semakin mendesak → prioritas lebih tinggi
+     * Semakin kecil nilainya maka semakin mendesak dan prioritas lebih tinggi
      * di PriorityQueue OrderManager.
      */
     private int deadlineTime;
 
     // ==================== CONSTRUCTOR ====================
 
-    /**
-     * Konstruktor lengkap untuk membuat objek DeliveryOrder.
-     *
-     * @param orderId         ID unik pesanan (contoh: "ORD-001")
-     * @param customerName    nama pelanggan pemesan
-     * @param restaurantNode  node asal/restoran (harus ada di Graph) → "asal"
-     *                        Dijkstra
-     * @param destinationNode node tujuan/rumah pelanggan (harus ada di Graph) →
-     *                        "tujuan" Dijkstra
-     * @param deadlineTime    batas waktu pengiriman dalam menit (harus > 0)
+    /*
+     * @param orderId ID unik pesanan (contoh: "ORD-001")
+     * 
+     * @param customerName nama pelanggan pemesan
+     * 
+     * @param restaurantNode node asal/restoran (harus ada di Graph)
+     * 
+     * @param destinationNode node tujuan/rumah pelanggan (harus ada di Graph)
+     * 
+     * @param deadlineTime batas waktu pengiriman dalam menit (harus > 0)
      */
     public DeliveryOrder(String orderId, String customerName,
             String restaurantNode, String destinationNode,
@@ -136,8 +127,8 @@ public class DeliveryOrder implements Comparable<DeliveryOrder> {
 
     /**
      * Metode pembanding untuk PriorityQueue di OrderManager (min-heap).
-     * Pesanan dengan deadlineTime LEBIH KECIL → prioritas lebih tinggi
-     * → dikeluarkan lebih dulu dari antrian.
+     * Pesanan dengan deadlineTime LEBIH KECIL maka prioritas lebih tinggi
+     * dan dikeluarkan lebih dulu dari antrian.
      *
      * @param other DeliveryOrder lain yang dibandingkan
      * @return negatif jika this lebih mendesak, positif jika sebaliknya
