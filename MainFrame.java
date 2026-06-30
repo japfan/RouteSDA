@@ -1,306 +1,442 @@
-
-/**
- * ============================================================
- * MainFrame.java - Dashboard Visual Sistem Optimasi Pengiriman
- * ============================================================
- * Menghubungkan visualisasi data input dari pengguna langsung ke dalam 
- * struktur data Graf (Modul 1) dan PriorityQueue Min-Heap (Modul 2).
- * * Modul   : Modul Antarmuka & Integrasi (GUI & Main)
- * Anggota : Anggota 3
- */
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.List;
 
 public class MainFrame extends JFrame {
-    private Graph graph;
-    private OrderManager orderManager;
+    private final Graph graph;
+    private final OrderManager orderManager;
 
-    // Komponen visual GUI Swing
-    private JTextArea txtAreaPeta;
+    private MapPanel mapPanel;
     private JTextArea txtAreaAntrean;
     private JTextArea txtAreaRute;
-    private JTextField txtOrderId, txtCustomerName, txtRestaurant, txtDestination, txtDeadline;
+    private JTextField txtOrderId, txtCustomerName, txtStartNode, txtDestination, txtDeadline;
+    private JButton btnTambah, btnProses;
+    private JLabel lblStatus;
+
+    // ── Warna datar ──
+    private static final Color WHITE      = new Color(255, 255, 255);
+    private static final Color BG         = new Color(248, 249, 250);
+    private static final Color BORDER     = new Color(210, 215, 225);
+    private static final Color TEXT_DARK  = new Color(40, 45, 55);
+    private static final Color TEXT_MUTED = new Color(130, 140, 155);
+    private static final Color BLUE       = new Color(55, 125, 210);
+    private static final Color BLUE_HOVER = new Color(70, 145, 230);
+    private static final Color GREEN      = new Color(60, 160, 100);
+    private static final Color GREEN_HOVER = new Color(80, 180, 120);
+    private static final Color RED        = new Color(210, 70, 60);
+    private static final Color INPUT_BG   = new Color(255, 255, 255);
+    private static final Font  FONT_MONO  = new Font("Monospaced", Font.PLAIN, 12);
+    private static final Font  FONT_BTN   = new Font("SansSerif", Font.BOLD, 13);
 
     public MainFrame() {
-        // 1. Instansiasi Data Core Proyek & Jalankan Seeder
         graph = new Graph();
         orderManager = new OrderManager();
         MapSeeder.seedMap(graph, orderManager);
 
-        // 2. Properti Jendela Utama (Window)
-        setTitle("Sistem Optimasi Rute Pengiriman Makanan - Dashboard Logistik");
-        setSize(950, 650);
+        try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception ignored) {}
+
+        setTitle("RouteSDA — Optimasi Rute Pengiriman Makanan");
+        setSize(1000, 720);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setLayout(new BorderLayout(10, 10));
+        getContentPane().setBackground(BG);
 
-        // 3. Membangun Komponen Tampilan
-        initComponents();
-
-        // 4. Sinkronisasi Data Awal ke Layar Visual
-        updatePetaDisplay();
-        updateAntreanDisplay();
+        initComponent();
+        updateAntreanView();
     }
 
-    private void initComponents() {
-        // ==================== PANEL KIRI (INPUT FORM & ANTREAN) ====================
-        JPanel panelKiri = new JPanel(new BorderLayout(5, 5));
-        panelKiri.setPreferredSize(new Dimension(380, 0));
+    private void initComponent() {
+        setLayout(new BorderLayout(0, 0));
 
-        JPanel panelInput = new JPanel(new GridLayout(6, 2, 5, 5));
-        panelInput.setBorder(BorderFactory.createTitledBorder("Input Pesanan Baru"));
+        JPanel header = header();
+        add(header, BorderLayout.NORTH);
 
-        panelInput.add(new JLabel(" Order ID:"));
-        txtOrderId = new JTextField();
-        panelInput.add(txtOrderId);
+        JPanel left = leftPanel();
+        add(left, BorderLayout.WEST);
 
-        panelInput.add(new JLabel(" Nama Pelanggan:"));
-        txtCustomerName = new JTextField();
-        panelInput.add(txtCustomerName);
+        JPanel center = centerPanel();
+        add(center, BorderLayout.CENTER);
 
-        panelInput.add(new JLabel(" Node Restoran (Asal):"));
-        txtRestaurant = new JTextField("Restoran");
-        panelInput.add(txtRestaurant);
+        JPanel footer = footer();
+        add(footer, BorderLayout.SOUTH);
 
-        panelInput.add(new JLabel(" Node Tujuan (Rumah):"));
-        txtDestination = new JTextField();
-        panelInput.add(txtDestination);
+        wireButtons();
+    }
 
-        panelInput.add(new JLabel(" Deadline (Menit):"));
-        txtDeadline = new JTextField();
-        panelInput.add(txtDeadline);
+    // ═══════════ HEADER ═══════════
 
-        JButton btnTambah = new JButton("Tambah Pesanan");
-        panelInput.add(new JLabel(""));
-        panelInput.add(btnTambah);
-        panelKiri.add(panelInput, BorderLayout.NORTH);
+    private JPanel header() {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBackground(WHITE);
+        p.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(0, 0, 1, 0, BORDER),
+            BorderFactory.createEmptyBorder(10, 16, 10, 16)));
 
-        txtAreaAntrean = new ReadOnlyTextArea("");
-        JScrollPane scrollAntrean = new JScrollPane(txtAreaAntrean);
-        scrollAntrean.setBorder(BorderFactory.createTitledBorder("Daftar Antrean (Priority Min-Heap By Deadline)"));
-        panelKiri.add(scrollAntrean, BorderLayout.CENTER);
+        JLabel title = new JLabel("RouteSDA");
+        title.setFont(new Font("SansSerif", Font.BOLD, 16));
+        title.setForeground(BLUE);
+        p.add(title, BorderLayout.WEST);
 
-        add(panelKiri, BorderLayout.WEST);
+        JLabel sub = new JLabel("Sistem Optimasi Rute Pengiriman Makanan");
+        sub.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        sub.setForeground(TEXT_MUTED);
+        p.add(sub, BorderLayout.EAST);
 
-        // ==================== PANEL KANAN (MAP & LOGISTIK RUTE) ====================
-        JPanel panelKanan = new JPanel(new GridLayout(2, 1, 5, 5));
+        return p;
+    }
 
-        txtAreaPeta = new ReadOnlyTextArea("");
-        JScrollPane scrollPeta = new JScrollPane(txtAreaPeta);
-        scrollPeta.setBorder(BorderFactory.createTitledBorder("Informasi Jaringan Jalan (Adjacency List Peta)"));
-        panelKanan.add(scrollPeta);
+    // ═══════════ LEFT PANEL ═══════════
 
-        JPanel panelProsesRute = new JPanel(new BorderLayout(5, 5));
-        JButton btnProses = new JButton("Proses & Cari Rute Tercepat untuk Pesanan Teratas");
-        btnProses.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btnProses.setBackground(new Color(46, 204, 113));
-        btnProses.setForeground(Color.WHITE);
+    private JPanel leftPanel() {
+        JPanel wrap = new JPanel(new BorderLayout(8, 8));
+        wrap.setBackground(BG);
+        wrap.setPreferredSize(new Dimension(330, 580));
+        wrap.setBorder(BorderFactory.createEmptyBorder(10, 12, 10, 6));
 
-        txtAreaRute = new ReadOnlyTextArea("Belum ada rute yang diproses.");
-        JScrollPane scrollRute = new JScrollPane(txtAreaRute);
-        scrollRute.setBorder(BorderFactory.createTitledBorder("Console Navigasi / Hasil Optimasi Rute Dijkstra"));
+        wrap.add(formPanel(), BorderLayout.NORTH);
+        wrap.add(antreanPanel(), BorderLayout.CENTER);
 
-        panelProsesRute.add(btnProses, BorderLayout.NORTH);
-        panelProsesRute.add(scrollRute, BorderLayout.CENTER);
-        panelKanan.add(panelProsesRute);
+        return wrap;
+    }
 
-        add(panelKanan, BorderLayout.CENTER);
+    private JPanel formPanel() {
+        JPanel p = new JPanel();
+        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        p.setBackground(WHITE);
+        p.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(BORDER, 1),
+            BorderFactory.createEmptyBorder(12, 12, 12, 12)));
+        p.setMaximumSize(new Dimension(300, 310));
 
-        // ==================== AKSI TOMBOL (INTEGRASI FITUR) ====================
+        JLabel head = new JLabel("Input Pesanan Baru");
+        head.setFont(new Font("SansSerif", Font.BOLD, 13));
+        head.setForeground(TEXT_DARK);
+        head.setAlignmentX(LEFT_ALIGNMENT);
+        p.add(head);
+        p.add(Box.createVerticalStrut(8));
 
-        btnTambah.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    String id = txtOrderId.getText().trim();
-                    String name = txtCustomerName.getText().trim();
-                    String rest = txtRestaurant.getText().trim();
-                    String dest = txtDestination.getText().trim();
-                    String deadlineText = txtDeadline.getText().trim();
+        p.add(lbl("Order ID"));
+        txtOrderId = field("ORD-004");
+        p.add(txtOrderId);
+        p.add(Box.createVerticalStrut(6));
 
-                    if (id.isEmpty() || name.isEmpty() || rest.isEmpty() || dest.isEmpty() || deadlineText.isEmpty()) {
-                        JOptionPane.showMessageDialog(MainFrame.this, "Semua kolom input wajib diisi!", "Peringatan",
-                                JOptionPane.WARNING_MESSAGE);
-                        return;
-                    }
+        p.add(lbl("Nama Pelanggan"));
+        txtCustomerName = field("Dian");
+        p.add(txtCustomerName);
+        p.add(Box.createVerticalStrut(6));
 
-                    int deadline = Integer.parseInt(deadlineText);
+        p.add(lbl("Lokasi Awal (Start Node)"));
+        txtStartNode = field("Restoran");
+        p.add(txtStartNode);
+        p.add(Box.createVerticalStrut(6));
 
-                    // FIX 1: Validasi deadline harus lebih dari 0
-                    if (deadline <= 0) {
-                        JOptionPane.showMessageDialog(MainFrame.this,
-                                "Deadline harus lebih dari 0 menit!",
-                                "Kesalahan Input", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
+        p.add(lbl("Tujuan (Node Peta)"));
+        txtDestination = field("Perumahan F");
+        p.add(txtDestination);
+        p.add(Box.createVerticalStrut(6));
 
-                    // FIX 2: Validasi node ke Graph dengan pesan error spesifik
-                    if (!graph.containsNode(rest)) {
-                        JOptionPane.showMessageDialog(MainFrame.this,
-                                "Node Restoran/Asal \"" + rest + "\" tidak terdaftar di peta!\n\n"
-                                        + "Node yang tersedia:\n" + graph.getAllNodes(),
-                                "Kesalahan Validasi Peta", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                    if (!graph.containsNode(dest)) {
-                        JOptionPane.showMessageDialog(MainFrame.this,
-                                "Node Tujuan \"" + dest + "\" tidak terdaftar di peta!\n\n"
-                                        + "Node yang tersedia:\n" + graph.getAllNodes(),
-                                "Kesalahan Validasi Peta", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
+        p.add(lbl("Deadline (menit)"));
+        txtDeadline = field("30");
+        p.add(txtDeadline);
+        p.add(Box.createVerticalStrut(10));
 
-                    DeliveryOrder order = new DeliveryOrder(id, name, rest, dest, deadline);
+        btnTambah = button("Tambah Pesanan", GREEN, GREEN_HOVER);
+        btnTambah.setAlignmentX(LEFT_ALIGNMENT);
+        btnTambah.setMaximumSize(new Dimension(276, 34));
+        p.add(btnTambah);
 
-                    // Memanggil validasi penuh milik Anggota 2 (node sudah dicek di atas)
-                    boolean sukses = orderManager.addOrder(order, graph);
+        JPanel outer = new JPanel(new BorderLayout());
+        outer.setBackground(BG);
+        outer.add(p, BorderLayout.NORTH);
+        return outer;
+    }
 
-                    if (sukses) {
-                        updateAntreanDisplay();
-                        txtOrderId.setText("");
-                        txtCustomerName.setText("");
-                        txtDestination.setText("");
-                        txtDeadline.setText("");
-                    } else {
-                        JOptionPane.showMessageDialog(MainFrame.this,
-                                "Gagal menambahkan pesanan! Silakan coba lagi.",
-                                "Kesalahan", JOptionPane.ERROR_MESSAGE);
-                    }
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(MainFrame.this, "Input Deadline harus berupa angka bulat!",
-                            "Kesalahan Input", JOptionPane.ERROR_MESSAGE);
-                }
+    private JLabel lbl(String t) {
+        JLabel l = new JLabel(t);
+        l.setFont(new Font("SansSerif", Font.PLAIN, 11));
+        l.setForeground(TEXT_MUTED);
+        l.setAlignmentX(LEFT_ALIGNMENT);
+        return l;
+    }
+
+    private JTextField field(String placeholder) {
+        JTextField tf = new JTextField();
+        tf.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        tf.setBackground(INPUT_BG);
+        tf.setForeground(TEXT_DARK);
+        tf.setCaretColor(TEXT_DARK);
+        tf.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(BORDER, 1),
+            BorderFactory.createEmptyBorder(5, 8, 5, 8)));
+        tf.setMaximumSize(new Dimension(276, 30));
+        tf.setAlignmentX(LEFT_ALIGNMENT);
+        return tf;
+    }
+
+    private JPanel antreanPanel() {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBackground(BG);
+
+        JLabel head = new JLabel("Daftar Antrean Pesanan");
+        head.setFont(new Font("SansSerif", Font.BOLD, 12));
+        head.setForeground(TEXT_DARK);
+        head.setBorder(BorderFactory.createEmptyBorder(4, 2, 6, 2));
+        p.add(head, BorderLayout.NORTH);
+
+        txtAreaAntrean = new JTextArea("Belum ada antrean pesanan.");
+        txtAreaAntrean.setEditable(false);
+        txtAreaAntrean.setLineWrap(true);
+        txtAreaAntrean.setWrapStyleWord(true);
+        txtAreaAntrean.setFont(FONT_MONO);
+        txtAreaAntrean.setBackground(WHITE);
+        txtAreaAntrean.setForeground(TEXT_DARK);
+        txtAreaAntrean.setBorder(BorderFactory.createEmptyBorder(6, 8, 6, 8));
+
+        JScrollPane sc = new JScrollPane(txtAreaAntrean);
+        sc.setBackground(BG);
+        sc.getViewport().setBackground(WHITE);
+        sc.setBorder(BorderFactory.createLineBorder(BORDER, 1));
+        sc.setPreferredSize(new Dimension(300, 260));
+        p.add(sc, BorderLayout.CENTER);
+
+        return p;
+    }
+
+    // ═══════════ CENTER PANEL ═══════════
+
+    private JPanel centerPanel() {
+        JPanel wrap = new JPanel(new BorderLayout(0, 8));
+        wrap.setBackground(BG);
+        wrap.setBorder(BorderFactory.createEmptyBorder(10, 6, 10, 12));
+
+        JPanel mapBox = new JPanel(new BorderLayout());
+        mapBox.setBackground(WHITE);
+        mapBox.setBorder(BorderFactory.createLineBorder(BORDER, 1));
+        mapPanel = new MapPanel(graph);
+        mapBox.add(mapPanel, BorderLayout.CENTER);
+        wrap.add(mapBox, BorderLayout.CENTER);
+
+        JPanel bottom = resultPanel();
+        wrap.add(bottom, BorderLayout.SOUTH);
+
+        return wrap;
+    }
+
+    private JPanel resultPanel() {
+        JPanel p = new JPanel(new BorderLayout(6, 6));
+        p.setBackground(BG);
+        p.setBorder(BorderFactory.createEmptyBorder(4, 0, 0, 0));
+
+        JPanel top = new JPanel(new BorderLayout(8, 0));
+        top.setBackground(BG);
+
+        btnProses = button("Cari Rute Tercepat", BLUE, BLUE_HOVER);
+        btnProses.setPreferredSize(new Dimension(200, 34));
+        top.add(btnProses, BorderLayout.WEST);
+
+        lblStatus = new JLabel("Siap memproses antrean");
+        lblStatus.setFont(new Font("SansSerif", Font.ITALIC, 11));
+        lblStatus.setForeground(TEXT_MUTED);
+        top.add(lblStatus, BorderLayout.CENTER);
+
+        p.add(top, BorderLayout.NORTH);
+
+        txtAreaRute = new JTextArea("Rute tercepat akan muncul di sini setelah tombol di atas diklik.");
+        txtAreaRute.setEditable(false);
+        txtAreaRute.setLineWrap(true);
+        txtAreaRute.setWrapStyleWord(true);
+        txtAreaRute.setFont(FONT_MONO);
+        txtAreaRute.setBackground(WHITE);
+        txtAreaRute.setForeground(TEXT_DARK);
+        txtAreaRute.setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
+
+        JScrollPane sc = new JScrollPane(txtAreaRute);
+        sc.setBackground(BG);
+        sc.getViewport().setBackground(WHITE);
+        sc.setBorder(BorderFactory.createLineBorder(BORDER, 1));
+        sc.setPreferredSize(new Dimension(620, 130));
+        p.add(sc, BorderLayout.CENTER);
+
+        return p;
+    }
+
+    // ═══════════ FOOTER ═══════════
+
+    private JPanel footer() {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBackground(WHITE);
+        p.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(1, 0, 0, 0, BORDER),
+            BorderFactory.createEmptyBorder(6, 16, 6, 16)));
+
+        JLabel l = new JLabel("RouteSDA v1.0  ·  Algoritma Dijkstra  ·  Priority Queue Min-Heap");
+        l.setFont(new Font("SansSerif", Font.PLAIN, 10));
+        l.setForeground(TEXT_MUTED);
+        p.add(l, BorderLayout.WEST);
+
+        JLabel r = new JLabel("7 Node  ·  11 Edge  ·  Undirected Graph");
+        r.setFont(new Font("SansSerif", Font.PLAIN, 10));
+        r.setForeground(TEXT_MUTED);
+        p.add(r, BorderLayout.EAST);
+
+        return p;
+    }
+
+    // ═══════════ BUTTON ═══════════
+
+    private JButton button(String text, Color bg, Color hover) {
+        JButton b = new JButton(text);
+        b.setFont(FONT_BTN);
+        b.setForeground(Color.WHITE);
+        b.setBackground(bg);
+        b.setBorder(BorderFactory.createEmptyBorder(7, 16, 7, 16));
+        b.setFocusPainted(false);
+        b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        b.setContentAreaFilled(false);
+        b.setOpaque(true);
+
+        b.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                if (b.isEnabled()) b.setBackground(hover);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                if (b.isEnabled()) b.setBackground(bg);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                if (b.isEnabled()) b.setBackground(bg.darker());
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                if (b.isEnabled()) b.setBackground(hover);
             }
         });
 
-        btnProses.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // FIX 4: Ambil topOrder sekali, teruskan ke cariRuteTopOrder — hindari panggil
-                // getTopOrder() ganda
-                DeliveryOrder topOrder = orderManager.getTopOrder();
+        return b;
+    }
 
-                if (topOrder != null) {
-                    List<String> ruteList = orderManager.cariRuteTopOrder(graph);
+    // ═══════════ LOGIC ═══════════
 
-                    // FIX 3: Hitung total jarak via RouteOptimizer.hitungTotalJarak()
-                    // agar angka jarak tampil di GUI, bukan hanya di console
-                    int totalJarak = RouteOptimizer.hitungTotalJarak(
-                            graph,
-                            topOrder.getRestaurantNode(),
-                            topOrder.getDestinationNode());
+    private void wireButtons() {
+        // 1. Aksi Tambah Pesanan (Dengan Pilihan Lokasi Awal)
+        btnTambah.addActionListener(e -> {
+            try {
+                String id = txtOrderId.getText().trim();
+                String cust = txtCustomerName.getText().trim();
+                String start = txtStartNode.getText().trim();
+                String dest = txtDestination.getText().trim();
+                String dl = txtDeadline.getText().trim();
 
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("========================================\n");
-                    sb.append("   HASIL NAVIGASI KURIR (DIJKSTRA)\n");
-                    sb.append("========================================\n");
-                    sb.append("Order ID    : ").append(topOrder.getOrderId()).append("\n");
-                    sb.append("Pelanggan   : ").append(topOrder.getCustomerName()).append("\n");
-                    sb.append("Titik Ambil : ").append(topOrder.getRestaurantNode()).append("\n");
-                    sb.append("Titik Antar : ").append(topOrder.getDestinationNode()).append("\n");
-                    sb.append("----------------------------------------\n");
-                    sb.append("RUTE TERCEPAT:\n");
+                // Validasi input kosong
+                if (id.isEmpty() || cust.isEmpty() || dest.isEmpty() || dl.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Semua field harus diisi.", "Peringatan", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
 
-                    if (ruteList.isEmpty()) {
-                        sb.append("Tidak ditemukan rute/jalur penghubung di dalam peta!\n");
-                    } else {
-                        for (int i = 0; i < ruteList.size(); i++) {
-                            sb.append(ruteList.get(i));
-                            if (i < ruteList.size() - 1)
-                                sb.append(" -> ");
-                        }
-                        sb.append("\n");
-                        sb.append("----------------------------------------\n");
-                        sb.append("Total Jarak : ").append(totalJarak).append(" satuan\n");
-                    }
-                    sb.append("========================================\n");
+                // Validasi apakah Node Awal ada di peta
+                if (!graph.containsNode(start)) {
+                    JOptionPane.showMessageDialog(this, "Lokasi awal '" + start + "' tidak ditemukan di peta!", "Error Node", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
 
-                    txtAreaRute.setText(sb.toString());
+                // Validasi apakah Node Tujuan ada di peta
+                if (!graph.containsNode(dest)) {
+                    JOptionPane.showMessageDialog(this, "Lokasi tujuan '" + dest + "' tidak ditemukan di peta!", "Error Node", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
 
-                    // Selesai diproses kurir, pesanan dihapus dari Heap
+                int deadline = Integer.parseInt(dl);
+                orderManager.addOrder(new DeliveryOrder(id, cust, start, dest, deadline), graph);
+                updateAntreanView();
+                mapPanel.resetAnimasi();
+
+                txtOrderId.setText(""); txtCustomerName.setText(""); txtStartNode.setText("Restoran");
+                txtDestination.setText(""); txtDeadline.setText("");
+
+                lblStatus.setText("Pesanan [" + id + "] ditambahkan");
+                lblStatus.setForeground(GREEN);
+
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Deadline harus berupa angka.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        btnProses.addActionListener(e -> {
+            DeliveryOrder top = orderManager.getTopOrder();
+            if (top == null) {
+                JOptionPane.showMessageDialog(this, "Tidak ada antrean pesanan.", "Antrean Kosong", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+
+            String asal = top.getRestaurantNode();
+            String tujuan = top.getDestinationNode();
+
+            btnProses.setEnabled(false);
+            btnTambah.setEnabled(false);
+            lblStatus.setText("Menjalankan Dijkstra...");
+            lblStatus.setForeground(BLUE);
+
+            RouteOptimizer.HasilAnimasi hasil = RouteOptimizer.hitungDijkstraDenganAnimasi(graph, asal, tujuan);
+
+            if (hasil.totalJarak < 0) {
+                btnProses.setEnabled(true);
+                btnTambah.setEnabled(true);
+                lblStatus.setText("Tidak ada jalur dari " + asal + " ke " + tujuan);
+                lblStatus.setForeground(RED);
+                JOptionPane.showMessageDialog(this, "Tidak ada jalur.", "Rute Tidak Ditemukan", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < hasil.path.size(); i++) {
+                sb.append(hasil.path.get(i));
+                if (i < hasil.path.size() - 1) sb.append("  →  ");
+            }
+
+            txtAreaRute.setText(
+                "HASIL OPTIMASI ALGORITMA DIJKSTRA\n" +
+                "======================================\n\n" +
+                "Detail Pesanan:\n" +
+                "  Order ID    : " + top.getOrderId() + "\n" +
+                "  Pelanggan   : " + top.getCustomerName() + "\n" +
+                "  Dari        : " + asal + "\n" +
+                "  Tujuan      : " + tujuan + "\n" +
+                "  Deadline    : " + top.getDeadlineTime() + " menit\n\n" +
+                "Rute Terpendek:\n" +
+                "  " + sb.toString() + "\n\n" +
+                "Total Jarak   : " + hasil.totalJarak + " meter\n" +
+                "Status        : Berhasil dioptimasi\n"
+            );
+
+            final String orderId = top.getOrderId();
+
+            mapPanel.mulaiAnimasi(hasil.langkahList, hasil.path, hasil.parentMap, () -> {
+                SwingUtilities.invokeLater(() -> {
                     orderManager.removeOrder();
-                    updateAntreanDisplay();
-                } else {
-                    JOptionPane.showMessageDialog(MainFrame.this, "Antrean pengiriman kosong!", "Informasi",
-                            JOptionPane.INFORMATION_MESSAGE);
-                }
-            }
+                    updateAntreanView();
+                    btnProses.setEnabled(true);
+                    btnTambah.setEnabled(true);
+                    lblStatus.setText("Rute ditemukan! Jarak: " + hasil.totalJarak + " m  |  Pesanan " + orderId + " selesai");
+                    lblStatus.setForeground(GREEN);
+                });
+            });
+
+            lblStatus.setText("Memutar animasi eksplorasi...");
+            lblStatus.setForeground(BLUE);
         });
     }
 
-    /**
-     * Membaca representasi graf internal dan mencetaknya menjadi struktur Adjacency
-     * List pada GUI.
-     * * ANALISIS KOMPLEKSITAS WAKTU:
-     * O(V + E) di mana V adalah jumlah Node dan E adalah jumlah Sisi/Jalan (Edge).
-     * Fungsi ini mengiterasi setiap node yang ada di graf (O(V)) lalu mengambil
-     * seluruh tetangga
-     * dari node tersebut (O(E)) untuk dirender dalam bentuk teks ke dalam komponen
-     * visual Swing JTextArea.
-     */
-    private void updatePetaDisplay() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("==================================================\n");
-        sb.append("             DAFTAR JALAN PETA PERUMAHAN          \n");
-        sb.append("==================================================\n");
-        for (String node : graph.getAllNodes()) {
-            sb.append(node).append(" -> [");
-            List<Edge> edges = graph.getNeighbors(node);
-            for (int i = 0; i < edges.size(); i++) {
-                sb.append(edges.get(i).getDestination())
-                        .append(" (bobot: ")
-                        .append(edges.get(i).getWeight())
-                        .append(")");
-                if (i < edges.size() - 1)
-                    sb.append(", ");
-            }
-            sb.append("]\n");
-        }
-        txtAreaPeta.setText(sb.toString());
-    }
-
-    /**
-     * Mengambil snapshot antrean berprioritas dan memperbarui daftar tampilan teks
-     * di layar GUI.
-     * * ANALISIS KOMPLEKSITAS WAKTU:
-     * O(N log N) di mana N adalah total jumlah pesanan yang aktif di dalam antrean.
-     * Untuk menampilkan data secara berurutan di layar tanpa merusak struktur asli
-     * Min-Heap dari
-     * PriorityQueue, fungsi memanggil orderManager.sortOrdersByDeadline() yang
-     * melakukan duplikasi
-     * array dan melakukan pengurutan ulang menggunakan Timsort (O(N log N)),
-     * kemudian mencetak string
-     * sebanyak O(N) ke GUI.
-     */
-    private void updateAntreanDisplay() {
+    private void updateAntreanView() {
         if (orderManager.isEmpty()) {
-            txtAreaAntrean.setText("Antrean kosong. Silakan input pesanan baru.");
-            return;
+            txtAreaAntrean.setText("Belum ada antrean pesanan.\n\nSilakan tambahkan pesanan baru\nmelalui form di atas.");
+        } else {
+            java.util.List<DeliveryOrder> list = orderManager.sortOrdersByDeadline();
+            StringBuilder sb = new StringBuilder();
+            int n = 1;
+            for (DeliveryOrder o : list) {
+                sb.append(n++).append(". [").append(o.getOrderId()).append("] ")
+                  .append(o.getCustomerName()).append("\n")
+                  .append("   Tujuan: ").append(o.getDestinationNode())
+                  .append("  |  Deadline: ").append(o.getDeadlineTime()).append(" mnt\n\n");
+            }
+            txtAreaAntrean.setText(sb.toString());
         }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format("Total pesanan aktif: %d\n", orderManager.getSize()));
-        sb.append("----------------------------------------------------------------------\n");
-
-        List<DeliveryOrder> snapshot = orderManager.sortOrdersByDeadline();
-        for (int i = 0; i < snapshot.size(); i++) {
-            sb.append(String.format("%d. %s\n", (i + 1), snapshot.get(i).toString()));
-        }
-        txtAreaAntrean.setText(sb.toString());
-    }
-}
-
-// Komponen Tambahan untuk Mengunci Text Area agar tidak bisa dimodifikasi
-// manual oleh user
-class ReadOnlyTextArea extends JTextArea {
-    public ReadOnlyTextArea(String text) {
-        super(text);
-        setEditable(false);
-        setLineWrap(true);
-        setWrapStyleWord(true);
-        setFont(new Font("Monospaced", Font.PLAIN, 12));
     }
 }
