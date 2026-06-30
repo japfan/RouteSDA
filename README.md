@@ -1,6 +1,6 @@
 # TitikTemu — Pencari Rute Terpendek
 
-Aplikasi desktop (Java Swing) yang mensimulasikan sistem pencarian rute terpendek berbasis graph. Program merepresentasikan peta sebagai graph berbobot, mengelola antrean titik tujuan berdasarkan urgensi deadline, dan mencari rute tercepat dari titik asal ke tujuan menggunakan algoritma Dijkstra — lengkap dengan visualisasi animasi proses pencarian rute pada peta.
+Program dengan bahasa Java yang mensimulasikan sistem pencarian rute terpendek berbasis graph. Program merepresentasikan peta sebagai graph berbobot, mengelola antrean titik tujuan berdasarkan urgensi deadline, dan mencari rute tercepat dari titik asal ke tujuan menggunakan algoritma Dijkstra lengkap dengan visualisasi animasi proses pencarian rute pada peta.
 
 Dikerjakan untuk tugas mata kuliah Struktur Data dan Algoritma, Tema 1: *Route Optimization and Network-Based Systems*.
 
