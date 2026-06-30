@@ -5,19 +5,14 @@ import java.util.Scanner;
  * InputValidator.java - Helper Class untuk Validasi Input
  * ============================================================
  *
- * Kelas pembantu (utility) dengan semua metode STATIS.
- * Tidak perlu di-instansiasi atau langsung panggil:
- * int n = InputValidator.readPositiveInt(sc, "Masukkan deadline: ");
- *
- * Tujuan utama: membungkus Scanner agar program TIDAK CRASH
+ * tujuannya untuk membungkus Scanner agar program TIDAK CRASH
  * ketika pengguna memasukkan tipe data yang salah.
  * Contoh masalah: program minta angka, pengguna ketik "abc"
  * jika tanpa validasi: NumberFormatException / InputMismatchException
  * dengan kelas ini: tampil pesan error, lalu minta input ulang
  *
  * Modul : Manajemen Pesanan (Sorting & Priority)
- * Anggota : Anggota 2
- *
+ * 
  * @author Anggota 2
  */
 public class InputValidator {
@@ -145,7 +140,7 @@ public class InputValidator {
      * ke Graph (Anggota 1) via Graph.containsNode().
      *
      * Jika node tidak ada di peta, tampilkan daftar node yang valid
-     * dan minta pengguna input ulang — loop sampai nama node valid.
+     * dan minta pengguna input ulang atau loop sampai nama node valid.
      *
      * Menghemat pekerjaan Anggota 3: MenuGUI tidak perlu menulis
      * logika validasi node secara manual di setiap input form.
@@ -218,9 +213,9 @@ public class InputValidator {
      * Alur:
      * 1. Baca orderId (non-empty string)
      * 2. Baca customerName (non-empty string)
-     * 3. Baca restaurantNode → validasi ke Graph (→ "asal" Dijkstra)
-     * 4. Baca destinationNode → validasi ke Graph (→ "tujuan" Dijkstra)
-     * 5. Baca deadlineTime → harus positif
+     * 3. Baca restaurantNode, validasi ke Graph
+     * 4. Baca destinationNode, validasi ke Graph
+     * 5. Baca deadlineTime, harus positif
      * 6. Buat dan kembalikan objek DeliveryOrder
      *
      * Contoh pakai di MenuGUI (menu 2 - Input Pesanan Baru):
@@ -240,9 +235,9 @@ public class InputValidator {
 
         // Kedua node ini akan jadi argumen hitungDijkstra() nanti
         String restaurantNode = readNodeName(sc,
-                "Node Restoran/Asal : ", graph); // → "asal" di Dijkstra
+                "Node Restoran/Asal : ", graph); // "asal" di Dijkstra
         String destinationNode = readNodeName(sc,
-                "Node Tujuan/Rumah  : ", graph); // → "tujuan" di Dijkstra
+                "Node Tujuan/Rumah  : ", graph); // "tujuan" di Dijkstra
 
         int deadlineTime = readPositiveInt(sc, "Deadline (menit)   : ");
 
