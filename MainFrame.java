@@ -34,7 +34,7 @@ public class MainFrame extends JFrame {
 
         try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception ignored) {}
 
-        setTitle("RouteSDA — Optimasi Rute Pengiriman Makanan");
+        setTitle("TitikTemu — Pencari Rute Terpendek");
         setSize(1000, 720);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -71,12 +71,12 @@ public class MainFrame extends JFrame {
             BorderFactory.createMatteBorder(0, 0, 1, 0, BORDER),
             BorderFactory.createEmptyBorder(10, 16, 10, 16)));
 
-        JLabel title = new JLabel("RouteSDA");
+        JLabel title = new JLabel("TitikTemu");
         title.setFont(new Font("SansSerif", Font.BOLD, 16));
         title.setForeground(BLUE);
         p.add(title, BorderLayout.WEST);
 
-        JLabel sub = new JLabel("Sistem Optimasi Rute Pengiriman Makanan");
+        JLabel sub = new JLabel("Pencari Rute Terpendek — Algoritma Dijkstra");
         sub.setFont(new Font("SansSerif", Font.PLAIN, 12));
         sub.setForeground(TEXT_MUTED);
         p.add(sub, BorderLayout.EAST);
@@ -268,7 +268,7 @@ public class MainFrame extends JFrame {
             BorderFactory.createMatteBorder(1, 0, 0, 0, BORDER),
             BorderFactory.createEmptyBorder(6, 16, 6, 16)));
 
-        JLabel l = new JLabel("RouteSDA v1.0  ·  Algoritma Dijkstra  ·  Priority Queue Min-Heap");
+        JLabel l = new JLabel("TitikTemu v1.0  ·  Algoritma Dijkstra  ·  Priority Queue Min-Heap");
         l.setFont(new Font("SansSerif", Font.PLAIN, 10));
         l.setForeground(TEXT_MUTED);
         p.add(l, BorderLayout.WEST);

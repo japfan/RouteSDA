@@ -1,6 +1,6 @@
-# RouteSDA — Sistem Optimasi Rute Pengiriman Makanan
+# TitikTemu — Pencari Rute Terpendek
 
-Aplikasi desktop (Java Swing) yang mensimulasikan sistem logistik kurir pengiriman makanan. Program merepresentasikan peta perumahan sebagai graph berbobot, mengelola antrean pesanan berdasarkan urgensi deadline, dan mencari rute tercepat dari restoran ke rumah pelanggan menggunakan algoritma Dijkstra — lengkap dengan visualisasi animasi proses pencarian rute pada peta.
+Aplikasi desktop (Java Swing) yang mensimulasikan sistem pencarian rute terpendek berbasis graph. Program merepresentasikan peta sebagai graph berbobot, mengelola antrean titik tujuan berdasarkan urgensi deadline, dan mencari rute tercepat dari titik asal ke tujuan menggunakan algoritma Dijkstra — lengkap dengan visualisasi animasi proses pencarian rute pada peta.
 
 Dikerjakan untuk tugas mata kuliah Struktur Data dan Algoritma, Tema 1: *Route Optimization and Network-Based Systems*.
 
@@ -60,7 +60,7 @@ javac *.java
 java Main
 ```
 
-Program terbuka sebagai jendela aplikasi desktop (Swing GUI) berjudul **RouteSDA**, lengkap dengan peta, form input pesanan, dan antrean (tidak ada interaksi via terminal/Scanner saat runtime.)
+Program terbuka sebagai jendela aplikasi desktop (Swing GUI) berjudul **TitikTemu**, lengkap dengan peta, form input data, dan antrean (tidak ada interaksi via terminal/Scanner saat runtime.)
 
 ### Menjalankan via IDE
 Import seluruh file `.java` ke dalam satu project baru (IntelliJ IDEA, Eclipse, NetBeans, atau VS Code dengan Extension Pack for Java), lalu jalankan `Main.java`.

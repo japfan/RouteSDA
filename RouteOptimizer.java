@@ -55,10 +55,9 @@ public class RouteOptimizer {
     /**
      * Cari rute terpendek dari asal ke tujuan menggunakan Dijkstra.
      *
-     * Kompleksitas: O((V + E) log V) — inisialisasi O(V), loop utama
-     * memproses tiap edge dengan operasi heap O(log V), rekonstruksi
-     * path O(V). Ruang O(V + E) untuk HashMap jarak/previous,
-     * HashSet visited, dan PriorityQueue.
+     * Kompleksitas: O((V + E) log V). inisialisasi O(V), loop utama
+     * memproses tiap edge dengan operasi heap O(log V), rekonstruksi path O(V). 
+     * Ruang O(V + E) untuk HashMap jarak/previous,HashSet visited, dan PriorityQueue.
      *
      * @param graph  graf peta
      * @param asal   node awal
@@ -79,24 +78,16 @@ public class RouteOptimizer {
             return new ArrayList<>();
         }
 
-        if (asal.equals(tujuan)) {
-            System.out.println("[INFO] Node asal dan tujuan sama: " + asal);
-            System.out.println("Total jarak: 0");
-            List<String> result = new ArrayList<>();
-            result.add(asal);
-            return result;
-        }
-
         // --- Inisialisasi ---
         HashMap<String, Integer> jarak = new HashMap<>();
         HashMap<String, String> previous = new HashMap<>();
         Set<String> visited = new HashSet<>();
 
         PriorityQueue<NodeJarak> minHeap = new PriorityQueue<>(
-                Comparator.comparingInt(nj -> nj.jarak));
+                Comparator.comparingInt(nj -> nj.jarak));//membandingkan jarak dari objek node untuk menentukan prioritas
 
         for (String node : graph.getAllNodes()) {
-            jarak.put(node, Integer.MAX_VALUE);
+            jarak.put(node, Integer.MAX_VALUE);//inisialisasi jarak awal ke semua node sebagai tak hingga
         }
         jarak.put(asal, 0);
         minHeap.offer(new NodeJarak(asal, 0));
@@ -138,7 +129,6 @@ public class RouteOptimizer {
         List<String> path = new ArrayList<>();
 
         if (!previous.containsKey(tujuan)) {
-            System.out.println("[INFO] Tidak ada jalur dari '" + asal + "' ke '" + tujuan + "'.");
             return path;
         }
 
@@ -147,34 +137,12 @@ public class RouteOptimizer {
             path.add(step);
             step = previous.get(step);
         }
-        Collections.reverse(path);
-
-        // Output hasil
-        System.out.println("========================================");
-        System.out.println("   HASIL PENCARIAN RUTE TERPENDEK");
-        System.out.println("========================================");
-        System.out.println("Dari   : " + asal);
-        System.out.println("Ke     : " + tujuan);
-        System.out.println("----------------------------------------");
-        System.out.print("Rute   : ");
-        for (int i = 0; i < path.size(); i++) {
-            System.out.print(path.get(i));
-            if (i < path.size() - 1) {
-                System.out.print(" -> ");
-            }
-        }
-        System.out.println();
-        System.out.println("----------------------------------------");
-        System.out.println("Total jarak: " + jarak.get(tujuan));
-        System.out.println("========================================");
-
+        Collections.reverse(path);     
         return path;
     }
 
     /**
-     * Versi ringkas hitungDijkstra: hanya mengembalikan total jarak,
-     * tanpa rekonstruksi path maupun output console. Digunakan oleh
-     * MainFrame untuk menampilkan angka jarak langsung di GUI.
+     * Sama seperti hitungDijkstra, tapi hanya mengembalikan total jarak terpendek
      *
      * Kompleksitas sama dengan hitungDijkstra: O((V + E) log V).
      *
@@ -219,7 +187,11 @@ public class RouteOptimizer {
         }
 
         int hasil = jarak.getOrDefault(tujuan, Integer.MAX_VALUE);
-        return (hasil == Integer.MAX_VALUE) ? -1 : hasil;
+        if (hasil == Integer.MAX_VALUE) {
+            return -1;
+        } else {
+            return hasil;
+        }
     }
 
     /**
@@ -227,7 +199,7 @@ public class RouteOptimizer {
      * visual di MapPanel. Tiap kali node dikunjungi atau edge di-relax,
      * satu entri LangkahAnimasi ditambahkan.
      *
-     * Kompleksitas: O((V + E) log V) — identik dengan hitungDijkstra,
+     * Kompleksitas: O((V + E) log V)
      * karena pencatatan langkah hanya O(1) per operasi.
      *
      * @param graph  graf peta
@@ -241,17 +213,10 @@ public class RouteOptimizer {
 
         // Validasi input
         if (!graph.containsNode(asal)) {
-            System.out.println("[ERROR] Node asal '" + asal + "' tidak ditemukan di graph!");
             return new HasilAnimasi(new ArrayList<>(), -1, langkahList, parentMap);
         }
         if (!graph.containsNode(tujuan)) {
-            System.out.println("[ERROR] Node tujuan '" + tujuan + "' tidak ditemukan di graph!");
             return new HasilAnimasi(new ArrayList<>(), -1, langkahList, parentMap);
-        }
-        if (asal.equals(tujuan)) {
-            List<String> path = new ArrayList<>();
-            path.add(asal);
-            return new HasilAnimasi(path, 0, langkahList, parentMap);
         }
 
         // --- Inisialisasi ---
@@ -313,15 +278,6 @@ public class RouteOptimizer {
         if (totalJarak == Integer.MAX_VALUE) totalJarak = -1;
 
         langkahList.add(new LangkahAnimasi(tujuan, null, totalJarak, "FINISH", null));
-
-        System.out.println("========================================");
-        System.out.println("   HASIL PENCARIAN RUTE TERPENDEK (ANIMASI)");
-        System.out.println("========================================");
-        System.out.println("Dari   : " + asal);
-        System.out.println("Ke     : " + tujuan);
-        System.out.println("Total jarak: " + totalJarak);
-        System.out.println("Jumlah langkah animasi: " + langkahList.size());
-        System.out.println("========================================");
 
         return new HasilAnimasi(path, totalJarak, langkahList, parentMap);
     }
