@@ -1,10 +1,10 @@
-import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.swing.*;
 
 public class MapPanel extends JPanel {
 
@@ -56,11 +56,11 @@ public class MapPanel extends JPanel {
 
         nodePositions.put("Restoran",    new Point(90, 170));
         nodePositions.put("Perumahan A", new Point(250, 75));
-        nodePositions.put("Perumahan B", new Point(250, 265));
+        nodePositions.put("Sekolah", new Point(250, 265));
         nodePositions.put("Perumahan C", new Point(430, 75));
         nodePositions.put("Perumahan D", new Point(430, 265));
         nodePositions.put("Perumahan E", new Point(610, 75));
-        nodePositions.put("Perumahan F", new Point(610, 265));
+        nodePositions.put("Rumah Sakit", new Point(610, 265));
 
         timer = new Timer(50, ev -> tick());
         timer.setCoalesce(true); // jangan numpuk event

@@ -19,19 +19,19 @@ public class MapSeeder {
     public static void seedMap(Graph graph, OrderManager orderManager) {
         // 1. Daftarkan jalan/edge (Otomatis mendaftarkan Node lewat Graph.addEdge dua arah)
         graph.addEdge("Restoran", "Perumahan A", 4);  
-        graph.addEdge("Restoran", "Perumahan B", 6);  
+        graph.addEdge("Restoran", "Sekolah", 6);  
         graph.addEdge("Perumahan A", "Perumahan C", 3);
         graph.addEdge("Perumahan A", "Perumahan D", 8);
-        graph.addEdge("Perumahan B", "Perumahan D", 2);
-        graph.addEdge("Perumahan B", "Perumahan E", 5);
+        graph.addEdge("Sekolah", "Perumahan D", 2);
+        graph.addEdge("Rumah Sakit", "Perumahan E", 5);
         graph.addEdge("Perumahan C", "Perumahan D", 1);
-        graph.addEdge("Perumahan C", "Perumahan F", 7);
+        graph.addEdge("Perumahan C", "Rumah Sakit", 7);
         graph.addEdge("Perumahan D", "Perumahan E", 3);
-        graph.addEdge("Perumahan D", "Perumahan F", 4);
-        graph.addEdge("Perumahan E", "Perumahan F", 2);
+        graph.addEdge("Perumahan D", "Rumah Sakit", 4);
+        graph.addEdge("Perumahan E", "Rumah Sakit", 2);
 
         // 2. Daftarkan dummy pesanan awal agar aplikasi tidak kosong saat live demo
-        orderManager.addOrderWithoutValidation(new DeliveryOrder("ORD-001", "Budi", "Restoran", "Perumahan F", 25));
+        orderManager.addOrderWithoutValidation(new DeliveryOrder("ORD-001", "Budi", "Restoran", "Rumah Sakit", 25));
         orderManager.addOrderWithoutValidation(new DeliveryOrder("ORD-002", "Siti", "Restoran", "Perumahan C", 15));
         orderManager.addOrderWithoutValidation(new DeliveryOrder("ORD-003", "Andi", "Restoran", "Perumahan E", 40));
     }
