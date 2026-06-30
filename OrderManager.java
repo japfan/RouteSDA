@@ -3,7 +3,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.PriorityQueue;
 
-/**
+/*
  * ============================================================
  * OrderManager.java - Manajer Antrian Pesanan Pengiriman
  * ============================================================
@@ -15,8 +15,6 @@ import java.util.PriorityQueue;
  * antrian — kurir selalu mengerjakan pesanan paling mendesak dulu.
  *
  * Modul : Manajemen Pesanan (Sorting & Priority)
- * Anggota : Anggota 2
- *
  * @author Anggota 2
  */
 public class OrderManager {
@@ -25,7 +23,7 @@ public class OrderManager {
 
     /**
      * Antrian prioritas utama. Menggunakan natural ordering dari
-     * DeliveryOrder.compareTo() → min-heap berdasarkan deadlineTime.
+     * DeliveryOrder.compareTo() untuk min-heap berdasarkan deadlineTime.
      * Pesanan paling mendesak (deadline terkecil) selalu di posisi poll().
      */
     private PriorityQueue<DeliveryOrder> orderQueue;
@@ -72,7 +70,7 @@ public class OrderManager {
             return false;
         }
 
-        // Validasi destinationNode → ini akan jadi "tujuan" di hitungDijkstra()
+        // Validasi destinationNode, ini akan jadi "tujuan" di hitungDijkstra()
         if (!graph.containsNode(order.getDestinationNode())) {
             System.out.println("[ERROR] Node tujuan '" + order.getDestinationNode()
                     + "' tidak ditemukan di peta! Pesanan " + order.getOrderId() + " ditolak.");
@@ -80,7 +78,7 @@ public class OrderManager {
             return false;
         }
 
-        // Semua validasi lolos → masuk antrian prioritas
+        // Semua validasi yang lolos masuk antrian prioritas
         orderQueue.offer(order);
         System.out.println("[OK] Pesanan " + order.getOrderId()
                 + " (" + order.getCustomerName() + ") berhasil ditambahkan ke antrian.");
@@ -153,8 +151,8 @@ public class OrderManager {
      *
      * Alur kerja internal:
      * 1. Ambil pesanan teratas via getTopOrder() (peek, tidak dihapus)
-     * 2. Ekstrak restaurantNode → sebagai parameter "asal" Dijkstra
-     * 3. Ekstrak destinationNode → sebagai parameter "tujuan" Dijkstra
+     * 2. Ekstrak restaurantNode sebagai parameter "asal" Dijkstra
+     * 3. Ekstrak destinationNode sebagai parameter "tujuan" Dijkstra
      * 4. Panggil RouteOptimizer.hitungDijkstra(graph, asal, tujuan)
      * 5. Kembalikan List<String> rute langkah-demi-langkah
      *
@@ -189,8 +187,8 @@ public class OrderManager {
 
         // ─────────────────────────────────────────────────────────────
         // INTI INTEGRASI: Panggil Dijkstra dari Anggota 1
-        // - restaurantNode → "asal" (titik pickup kurir)
-        // - destinationNode → "tujuan" (rumah pelanggan)
+        // - restaurantNode sebagai "asal" (titik pickup kurir)
+        // - destinationNode sebagai "tujuan" (rumah pelanggan)
         // ─────────────────────────────────────────────────────────────
         List<String> rute = RouteOptimizer.hitungDijkstra(
                 graph,
@@ -204,7 +202,7 @@ public class OrderManager {
     /**
      * Mengurutkan seluruh pesanan berdasarkan deadline (terkecil dulu).
      *
-     * TIDAK mengubah isi PriorityQueue asli — mengembalikan salinan
+     * TIDAK mengubah isi PriorityQueue asli
      * sebagai List untuk keperluan tampilan di displayQueue().
      *
      * @return List<DeliveryOrder> terurut dari deadline terkecil
@@ -227,7 +225,7 @@ public class OrderManager {
         if (orderQueue.isEmpty()) {
             System.out.println("|  (Tidak ada pesanan dalam antrian saat ini)                      |");
         } else {
-            // Ambil snapshot terurut — tidak mengubah antrian asli
+            // Ambil snapshot terurut
             List<DeliveryOrder> snapshot = sortOrdersByDeadline();
             for (int i = 0; i < snapshot.size(); i++) {
                 System.out.printf("|  %2d. %s%n", (i + 1), snapshot.get(i).toString());
