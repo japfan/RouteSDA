@@ -12,7 +12,6 @@ Dikerjakan untuk tugas mata kuliah Struktur Data dan Algoritma, Tema 1: *Route O
 | 2 | _Daffa Gathfan Chaidar_ | _L0125077_ | Modul Manajemen Pesanan — `DeliveryOrder.java`, `OrderManager.java`, `InputValidator.java` |
 | 3 | _Habibi Ramadan_ | _L0125045_ | Modul Antarmuka & Integrasi — `Main.java`, `MainFrame.java`, `MapPanel.java`, `MapSeeder.java` |
 
-> Ganti placeholder di atas dengan nama dan NIM masing-masing anggota.
 
 ## Fitur Utama
 
