@@ -83,4 +83,4 @@ Karena tidak ada library eksternal, tidak diperlukan tool manajemen dependency s
 
 ## Catatan Tambahan
 
-`InputValidator.java` menyediakan utilitas validasi input berbasis `Scanner` (`readInt`, `readPositiveInt`, `readNodeName`, dll.) yang dirancang untuk mode input baris-demi-baris di terminal. Pada build GUI saat ini (`MainFrame`), validasi yang setara diterapkan langsung memakai dialog Swing (`JOptionPane`) karena input pada GUI bersifat event-driven, bukan blocking seperti `Scanner`. Kelas ini tetap relevan sebagai modul mandiri — misalnya untuk mode command-line alternatif atau pengujian logika validasi secara terpisah dari GUI.
+`InputValidator.java` menyediakan utilitas validasi input berbasis `Scanner` (`readInt`, `readPositiveInt`, `readNodeName`, dll.) yang dirancang untuk mode input baris-demi-baris di terminal. Pada build GUI saat ini (`MainFrame`), validasi yang setara diterapkan langsung memakai dialog Swing (`JOptionPane`) karena input pada GUI bersifat event-driven, bukan blocking seperti `Scanner`. Kelas ini tetap relevan sebagai modul mandiri, misalnya untuk mode command-line alternatif atau pengujian logika validasi secara terpisah dari GUI.
